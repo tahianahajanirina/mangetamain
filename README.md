@@ -1,8 +1,8 @@
-# MonGetaMain - Système de Recommandation de Recettes
+# MangeTaMain - Système de Recommandation de Recettes
 
 ## 📋 Vue d'ensemble du projet
 
-**MonGetaMain** est un projet de Data Science visant à développer un système intelligent de recommandation de recettes personnalisées en exploitant les données historiques d'interactions utilisateurs et les caractéristiques des recettes de Food.com.
+**MangeTaMain** est un projet de Data Science visant à développer un système intelligent de recommandation de recettes personnalisées en exploitant les données historiques d'interactions utilisateurs et les caractéristiques des recettes de Food.com.
 
 ### Problématique
 
