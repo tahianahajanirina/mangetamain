@@ -44,7 +44,9 @@ uv.lock
 *.ipynb_checkpoints
 
 # Data
-data/*.csv
+data/raw/*.csv
+data/processed/*.csv
+data/external/*.csv
 data/*.json
 data/*.pkl
 !data/.gitkeep
@@ -59,6 +61,9 @@ outputs/*.log
 !outputs/models/.gitkeep
 !outputs/figures/.gitkeep
 !outputs/reports/.gitkeep
+
+# Docker
+.env" >> .gitignore
 
 # Testing
 .pytest_cache/

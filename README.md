@@ -303,6 +303,29 @@ mongetamain/
 └── README.md
 ```
 
+```
+data/
+├── raw/                    # Données brutes (originales)
+│   ├── interactions_test.csv
+│   ├── interactions_train.csv
+│   ├── interactions_validation.csv
+│   ├── PP_recipes.csv
+│   ├── PP_users.csv
+│   ├── RAW_interactions.csv
+│   └── RAW_recipes.csv
+├── processed/              # Données traitées
+│   ├── cleaned_interactions.csv
+│   ├── cleaned_recipes.csv
+│   └── features/
+└── README.md              # Ce fichier
+```
+
+## Instructions
+
+1. **Placez vos fichiers CSV dans le dossier `raw/`**
+2. Les données traitées seront automatiquement sauvegardées dans `processed/`
+3. N'éditez jamais les fichiers dans `raw/` - ils servent de référence
+
 ---
 
 ## 👥 Organisation de l'équipe
