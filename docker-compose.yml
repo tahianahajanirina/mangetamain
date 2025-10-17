@@ -1,22 +1,23 @@
 version: '3.8'
 
 services:
-  mangetamain:
+  mangetamain: 
     build: .
     container_name: mangetamain-app
     ports:
       - "8000:8000"  # Pour d'éventuelles applications web
     volumes:
       # Montage du code source (pour le développement VS Code)
-      - .:/home/app
+      - .:/workspace
       # Montage persistant pour les données
-      - ./data:/home/app/data
+      - ./data:/workspace/data
       # Montage persistant pour les outputs
-      - ./outputs:/home/app/outputs
+      - ./outputs:/workspace/outputs
       # Montage persistant pour les notebooks
-      - ./notebooks:/home/app/notebooks
+      - ./notebooks:/workspace/notebooks
     environment:
-      - PYTHONPATH=/home/app
+      - PYTHONPATH=/workspace
+    working_dir: /workspace
     restart: unless-stopped
     stdin_open: true
     tty: true
