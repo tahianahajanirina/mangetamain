@@ -23,16 +23,18 @@ RUN apt-get update && apt-get install -y \
 # Créer un utilisateur non-root pour la sécurité
 RUN useradd --create-home --shell /bin/bash app
 USER app
-WORKDIR /home/app
+WORKDIR /workspace
 
-# Copier les fichiers de configuration Python
+# Copier les fichiers de configuration Python et README
 COPY --chown=app:app pyproject.toml ./
+COPY --chown=app:app README.md ./
 
 # Installer les dépendances Python
 RUN pip install --user --no-cache-dir --upgrade pip setuptools wheel
 RUN pip install --user --no-cache-dir .
+RUN pip install --user --no-cache-dir ipykernel jupyter
 
-# Copier le code source
+# Copier le reste du code source
 COPY --chown=app:app . .
 
 # Créer les dossiers nécessaires
@@ -43,7 +45,7 @@ EXPOSE 8000
 
 # Variables d'environnement pour Python
 ENV PATH="/home/app/.local/bin:${PATH}"
-ENV PYTHONPATH="/home/app:${PYTHONPATH}"
+ENV PYTHONPATH="/workspace:${PYTHONPATH}"
 
 # Container reste en vie pour développement VS Code
 CMD ["tail", "-f", "/dev/null"]
