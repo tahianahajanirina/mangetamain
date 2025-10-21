@@ -1,0 +1,26 @@
+{
+    "name": "MangeTaMain Dev Container",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "mangetamain",
+    "workspaceFolder": "/workspace",
+    
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance", 
+                "ms-toolsai.jupyter",
+                "ms-python.black-formatter"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.analysis.autoImportCompletions": true,
+                "jupyter.interactiveWindow.creationMode": "perFile",
+                "python.terminal.activateEnvironment": false
+            }
+        }
+    },
+    
+    "remoteUser": "app",
+    "postCreateCommand": "echo 'Dev Container MangeTaMain prêt ! 🍽️'"
+}
