@@ -69,3 +69,6 @@ htmlcov/
 
 # Logs
 *.log
+
+# Sentiment Analysis Model
+src/sentiment_analysis/model/
