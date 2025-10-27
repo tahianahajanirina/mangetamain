@@ -44,10 +44,7 @@ uv.lock
 *.ipynb_checkpoints
 
 # Data
-data/raw/*.csv
-data/processed/*.csv
-data/external/*.csv
-data/*.json
+data/*.csv
 data/*.pkl
 !data/.gitkeep
 
@@ -63,7 +60,7 @@ outputs/*.log
 !outputs/reports/.gitkeep
 
 # Docker
-.env" >> .gitignore
+.env
 
 # Testing
 .pytest_cache/
@@ -72,3 +69,6 @@ htmlcov/
 
 # Logs
 *.log
+
+# Sentiment Analysis Model
+src/sentiment_analysis/model/
