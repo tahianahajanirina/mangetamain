@@ -170,8 +170,8 @@ class RecipeFeatureBuilder:
             'columns': list(self.recipes_features.columns)
         }
         
-        # Stats sur les features
-        feature_cols = ['popularity_score', 'log_minutes', 'time_complexity', 
+        # Stats sur les features (MODIFIÉ: health_category au lieu de popularity_score)
+        feature_cols = ['log_minutes', 'time_complexity', 
                        'efficiency', 'health_category']
         
         for col in feature_cols:
