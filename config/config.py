@@ -10,9 +10,12 @@ from typing import Dict, List, Any
 # Project paths
 PROJECT_ROOT = Path(__file__).parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
+DATA_RAW = DATA_DIR / "raw"
+DATA_PROCESSED = DATA_DIR / "processed"
 OUTPUT_DIR = PROJECT_ROOT / "outputs"
 MODEL_DIR = OUTPUT_DIR / "models"
 FIGURE_DIR = OUTPUT_DIR / "figures"
+OUTPUTS_FIGURES = FIGURE_DIR  # Alias for compatibility
 REPORT_DIR = OUTPUT_DIR / "reports"
 
 # Data files
