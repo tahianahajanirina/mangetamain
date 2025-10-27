@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  mangetamain: 
+    build: .
+    container_name: mangetamain-app
+    ports:
+      - "8000:8000"  # Pour d'éventuelles applications web
+    volumes:
+      # Montage du code source (pour le développement VS Code)
+      - .:/workspace
+      # Montage persistant pour les données
+      - ./data:/workspace/data
+      # Montage persistant pour les outputs
+      - ./outputs:/workspace/outputs
+      # Montage persistant pour les notebooks
+      - ./notebooks:/workspace/notebooks
+    environment:
+      - PYTHONPATH=/workspace
+    working_dir: /workspace
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    command: >
+      bash -c "
+        echo 'Container démarré pour le projet MangeTaMain 🍽️' &&
+        echo 'Prêt pour développement VS Code avec Remote Containers' &&
+        echo 'Utilisez VS Code Remote-Containers pour vous connecter' &&
+        tail -f /dev/null
+      "
+
+  # Service optionnel pour une base de données (si nécessaire plus tard)
+  # postgres:
+  #   image: postgres:15
+  #   container_name: mangetamain-db
+  #   environment:
+  #     POSTGRES_DB: mangetamain
+  #     POSTGRES_USER: user
+  #     POSTGRES_PASSWORD: password
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+
+volumes:
+  postgres_data:
