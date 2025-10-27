@@ -69,6 +69,9 @@ def main():
         clusterer.plot_clusters(output_dir=str(OUTPUTS_FIGURES))
         clusterer.save_results(str(output_path))
         
+        # IMPORTANT: Sauvegarder le modèle .pkl
+        model_name = clusterer.save_model()
+        
         stats = clusterer.get_stats()
         
         # SYNTHÈSE FINALE
@@ -83,6 +86,7 @@ def main():
         print(f"\n📁 Fichiers générés:")
         print(f"  • Features: {features_path}")
         print(f"  • Clustering: {output_path}")
+        print(f"  • Modèle: outputs/models/{model_name}_*.pkl")
         print(f"  • Visualisation: {OUTPUTS_FIGURES / '07c_recipes_clusters_pca_v3.png'}")
         
         print(f"\n🏷️  Clusters créés:")
