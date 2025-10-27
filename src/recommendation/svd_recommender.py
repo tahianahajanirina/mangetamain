@@ -8,7 +8,7 @@ import pandas as pd
 from scipy.sparse.linalg import svds
 import logging
 from pathlib import Path
-from data_processor import DataProcessor
+from src.recommendation.data_processor import DataProcessor
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
