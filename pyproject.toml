@@ -1,9 +1,9 @@
 [project]
-name = "recipe-ml"
+name = "mangetamain"
 version = "1.0.0"
-description = "Machine learning pipeline for recipe time prediction and nutritional value tagging"
+description = "Machine learning pipeline for recipe recommendation, time prediction, nutritional value tagging, and sentiment analysis"
 authors = [
-    {name = "Your Name", email = "your.email@example.com"}
+    {name = "MangeTaMain Team", email = "team@mangetamain.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.9"
@@ -23,6 +23,11 @@ dependencies = [
     "wordcloud>=1.9.0",
     "python-dateutil>=2.8.0",
     "hdbscan>=0.8.33",
+    "tqdm>=4.65.0",
+    "transformers>=4.30.0",
+    "torch>=2.0.0",
+    "huggingface-hub>=0.16.0",
+    "streamlit>=1.28.0",
 ]
 
 [project.optional-dependencies]
@@ -50,6 +55,7 @@ ignore = ["E501"]
 [project.scripts]
 recipe-time-prediction = "main_time_prediction:main"
 recipe-nutrition-tagging = "main_nutrition_tagging:main"
+recipe-sentiment-analysis = "main_sentiment_analysis:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
