@@ -1,8 +1,8 @@
-# MonGetaMain - Système de Recommandation de Recettes
+# MangeTaMain - Système de Recommandation de Recettes
 
 ## 📋 Vue d'ensemble du projet
 
-**MonGetaMain** est un projet de Data Science visant à développer un système intelligent de recommandation de recettes personnalisées en exploitant les données historiques d'interactions utilisateurs et les caractéristiques des recettes de Food.com.
+**MangeTaMain** est un projet de Data Science visant à développer un système intelligent de recommandation de recettes personnalisées en exploitant les données historiques d'interactions utilisateurs et les caractéristiques des recettes de Food.com.
 
 ### Problématique
 
@@ -302,6 +302,29 @@ mongetamain/
 ├── .gitignore
 └── README.md
 ```
+
+```
+data/
+├── raw/                    # Données brutes (originales)
+│   ├── interactions_test.csv
+│   ├── interactions_train.csv
+│   ├── interactions_validation.csv
+│   ├── PP_recipes.csv
+│   ├── PP_users.csv
+│   ├── RAW_interactions.csv
+│   └── RAW_recipes.csv
+├── processed/              # Données traitées
+│   ├── cleaned_interactions.csv
+│   ├── cleaned_recipes.csv
+│   └── features/
+└── README.md              # Ce fichier
+```
+
+## Instructions
+
+1. **Placez vos fichiers CSV dans le dossier `raw/`**
+2. Les données traitées seront automatiquement sauvegardées dans `processed/`
+3. N'éditez jamais les fichiers dans `raw/` - ils servent de référence
 
 ---
 
