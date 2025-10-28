@@ -48,7 +48,8 @@ data/raw/*.csv
 data/processed/*.csv
 data/raw/*.pkl
 data/processed/*.pkl
-!data/.gitkeep
+!data/raw/.gitkeep
+!data/processed/.gitkeep
 
 # Outputs
 outputs/models/*.pkl
@@ -58,9 +59,11 @@ outputs/figures/*.jpg
 outputs/reports/*.txt
 outputs/reports/*.html
 outputs/*.log
+outputs/sentiment_model/*
 !outputs/models/.gitkeep
 !outputs/figures/.gitkeep
 !outputs/reports/.gitkeep
+!outputs/sentiment_model/.gitkeep
 
 # Docker
 .env
