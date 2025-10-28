@@ -126,7 +126,7 @@ jobs:
         ls -lh outputs/models/
     
     - name: Upload trained models
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: trained-models-${{ github.run_number }}
         path: |
@@ -135,7 +135,7 @@ jobs:
         retention-days: 30
     
     - name: Upload figures and reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ml-outputs-${{ github.run_number }}
         path: |
