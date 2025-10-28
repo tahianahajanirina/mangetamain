@@ -53,6 +53,7 @@ data/*.pkl
 
 # Outputs
 outputs/models/*.pkl
+outputs/models/*.json
 outputs/figures/*.png
 outputs/figures/*.jpg
 outputs/reports/*.txt
