@@ -100,11 +100,11 @@ logger = logging.getLogger(__name__)
 @st.cache_resource
 def load_pipeline():
     """Load and cache the recipe discovery system."""
-    with st.spinner("🔄 Loading recipe database..."):
+    with st.spinner("Loading recipe database..."):
         try:
             pipeline = IntegratedRecommendationPipeline(
-                recipes_path="data/RAW_recipes.csv",
-                interactions_path="data/RAW_interactions.csv",
+                recipes_path="data/raw/RAW_recipes.csv",
+                interactions_path="data/raw/RAW_interactions.csv",
                 models_dir="outputs/models",
                 load_models=True
             )
