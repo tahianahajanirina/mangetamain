@@ -69,6 +69,10 @@ outputs/*.log
 .pytest_cache/
 .coverage
 htmlcov/
+coverage.xml
+.tox/
+*.cover
+.hypothesis/
 
 # Logs
 *.log
