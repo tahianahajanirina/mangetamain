@@ -24,7 +24,8 @@ dependencies = [
     "python-dateutil>=2.8.0",
     "hdbscan>=0.8.33",
     "streamlit>=1.28.0",
-    "plotly>=5.18.0",
+    "plotly>=5.17.0",
+    "google-generativeai>=0.3.0",
 ]
 
 [project.optional-dependencies]
@@ -34,6 +35,10 @@ dev = [
     "pytest>=7.3.0",
     "black>=23.0.0",
     "ruff>=0.1.0",
+]
+sentiment = [
+    "transformers>=4.30.0",
+    "torch>=2.0.0",
 ]
 
 [build-system]
