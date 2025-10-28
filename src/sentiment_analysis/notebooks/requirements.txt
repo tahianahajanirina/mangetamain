@@ -1,0 +1,9 @@
+pandas
+transformers
+scikit-learn
+seaborn
+tqdm
+torch
+huggingface_hub
+huggingface_hub[cli]
+huggingface_hub[hf_xet]

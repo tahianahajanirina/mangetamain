@@ -46,9 +46,8 @@ uv.lock
 # Data
 data/raw/*.csv
 data/processed/*.csv
-data/external/*.csv
-data/*.json
-data/*.pkl
+data/raw/*.pkl
+data/processed/*.pkl
 !data/.gitkeep
 
 # Outputs
@@ -64,7 +63,7 @@ outputs/*.log
 !outputs/reports/.gitkeep
 
 # Docker
-.env" >> .gitignore
+.env
 
 # Testing
 .pytest_cache/
@@ -73,3 +72,6 @@ htmlcov/
 
 # Logs
 *.log
+
+# Sentiment Analysis Model
+src/sentiment_analysis/model/

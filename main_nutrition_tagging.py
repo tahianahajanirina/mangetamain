@@ -133,7 +133,8 @@ def main():
 
             # Extract model type
             model_type = model_name
-            model_kwargs = {k: v for k, v in model_params.items() if k != 'name'}
+            model_kwargs = {k: v for k, v in model_params.items()
+                          if k not in ['name', 'random_state']}
 
             try:
                 # Train model

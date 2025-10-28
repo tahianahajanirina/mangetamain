@@ -18,9 +18,13 @@ FIGURE_DIR = OUTPUT_DIR / "figures"
 OUTPUTS_FIGURES = FIGURE_DIR  # Alias for compatibility
 REPORT_DIR = OUTPUT_DIR / "reports"
 
+DATA_RAW = DATA_DIR / "raw"
+DATA_PROCESSED = DATA_DIR / "processed"
+OUTPUTS_FIGURES = FIGURE_DIR
+
 # Data files
-RAW_DATA_FILE = DATA_DIR / "RAW_recipes.csv"
-PROCESSED_DATA_FILE = DATA_DIR / "processed_recipes.csv"
+RAW_DATA_FILE = DATA_RAW / "RAW_recipes.csv"
+PROCESSED_DATA_FILE = DATA_PROCESSED / "processed_recipes.csv"
 
 # Task configurations
 TASK_CONFIG = {
@@ -166,6 +170,16 @@ MODEL_CONFIG = {
             }
         }
     }
+}
+
+# Chatbot configuration
+CHATBOT_CONFIG = {
+    # To use the chatbot, add your Google Gemini API key here
+    # Get your API key from: https://makersuite.google.com/app/apikey
+    "gemini_api_key": "AIzaSyDpyn8VOKAWqik7nWSMmxSsX9PTsT5wZQw",  # Add your API key here or set via environment variable GEMINI_API_KEY
+    "model": "gemini-2.0-flash-exp",
+    "max_history": 10,
+    "retrieval_top_k": 5
 }
 
 # Logging configuration
