@@ -30,7 +30,7 @@ print("=" * 80)
 
 # Check device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print(f"\n🖥️  Device: {device}")
+print(f"\n  Device: {device}")
 if torch.cuda.is_available():
     print(f"   GPU: {torch.cuda.get_device_name(0)}")
 else:
@@ -43,7 +43,7 @@ print("\n" + "=" * 80)
 print("LOADING DATA")
 print("=" * 80)
 
-data_path = Path(__file__).parent / "data" / "RAW_interactions.csv"
+data_path = Path(__file__).parent / "data" / "raw" / "RAW_interactions.csv"
 print(f"\nLoading: {data_path}")
 
 df_reviews = pd.read_csv(data_path)

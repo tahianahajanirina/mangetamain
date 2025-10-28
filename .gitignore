@@ -44,11 +44,10 @@ uv.lock
 *.ipynb_checkpoints
 
 # Data
-data/*.csv
-data/*.pkl
 data/raw/*.csv
 data/processed/*.csv
-data/*.pkl
+data/raw/*.pkl
+data/processed/*.pkl
 !data/.gitkeep
 
 # Outputs
