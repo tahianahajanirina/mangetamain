@@ -1,385 +1,321 @@
-# MangeTaMain - Système de Recommandation de Recettes
+# MangeTaMain - Your Personal Recipe Discovery Platform
 
-## 📋 Vue d'ensemble du projet
-
-**MangeTaMain** est un projet de Data Science visant à développer un système intelligent de recommandation de recettes personnalisées en exploitant les données historiques d'interactions utilisateurs et les caractéristiques des recettes de Food.com.
-
-### Problématique
-
-*Comment exploiter les données historiques d'interactions et les évaluations des plats et ingrédients afin d'identifier et anticiper les préférences culinaires des utilisateurs, dans le but de recommander des recettes personnalisées et d'optimiser l'expérience ainsi que l'engagement sur une plateforme de recettes en ligne ?*
+Welcome to **MangeTaMain**, an intelligent recipe discovery platform that helps you find the perfect recipes based on your taste, dietary needs, and cooking preferences!
 
 ---
 
-## 📊 Dataset
+## What is MangeTaMain?
 
-**Source** : [Kaggle - Food.com Recipes and User Interactions](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions)
+MangeTaMain is a smart cooking companion that analyzes over 230,000 recipes and 1 million user reviews to help you discover recipes you'll love. Whether you're looking for quick weeknight dinners, healthy meals, or exploring new cuisines, MangeTaMain has you covered!
 
-### Fichiers de données
+### Key Features
 
-#### RAW_recipes.csv (231 638 lignes, 12 colonnes)
-- `id` : Identifiant unique de la recette
-- `name` : Nom de la recette
-- `contributor_id` : ID du contributeur
-- `submitted` : Date de soumission
-- `tags` : Tags associés à la recette
-- `minutes` : Temps de préparation en minutes
-- `nutrition` : 7 valeurs nutritionnelles (calories, lipides, sucre, sodium, protéines, graisses saturées, glucides)
-- `n_steps` : Nombre d'étapes
-- `steps` : Étapes de préparation
-- `ingredients` : Liste des ingrédients
-- `n_ingredients` : Nombre d'ingrédients
-- `description` : Description de la recette
-
-#### RAW_interactions.csv (1 000 000+ lignes, 5 colonnes)
-- `user_id` : Identifiant utilisateur
-- `recipe_id` : Identifiant de la recette
-- `date` : Date de l'interaction
-- `rating` : Note de 1 à 5 étoiles
-- `review` : Avis textuel
-
-**Période couverte** : 18 ans (2000–2018)
+- **Personalized Suggestions**: Get recipe recommendations tailored to your taste
+- **Smart Search**: Find recipes similar to ones you already love
+- **Time Estimation**: Know how long a recipe will take before you start
+- **Nutrition Information**: Understand the nutritional profile of any recipe
+- **Recipe Categories**: Browse recipes organized by cooking time, complexity, and health profile
+- **User Reviews Analysis**: See what other home cooks think about recipes
 
 ---
 
-## 🎯 Objectifs du projet
+## Getting Started
 
-### 1. Personnalisation et Rétention Utilisateur
+### Installation Requirements
 
-**Objectif Business**
-- Augmenter le temps passé sur la plateforme
-- Réduire le taux de rebond
-- Améliorer la satisfaction et fidélisation client
+Before you begin, make sure you have:
+- Python 3.8 or higher installed on your computer
+- Basic familiarity with running commands in a terminal
 
-**Objectif Data Science**
-- Développer un système de recommandation personnalisé
-- Techniques : Filtrage collaboratif, factorisation matricielle (SVD, NMF), modèles hybrides
-- Métriques : RMSE, MAE, Precision@K, Recall@K, Hit Rate
-
-### 2. Optimisation du Contenu et Qualité des Recettes
-
-**Objectif Business**
-- Identifier les caractéristiques des recettes à succès
-- Guider les créateurs de contenu
-- Réduire les recettes mal notées
-
-**Objectif Data Science**
-- Prédire la note moyenne d'une recette avant publication
-- Techniques : Régression (Random Forest, XGBoost, Gradient Boosting)
-- Métriques : MSE, RMSE, R², MAE
-
-### 3. Compréhension Client et Amélioration Continue
-
-**Objectif Business**
-- Comprendre les facteurs de satisfaction/insatisfaction
-- Détecter rapidement les problèmes de qualité
-- Améliorer le service client et la modération
-
-**Objectif Data Science**
-- Classification automatique des sentiments et identification des thèmes
-- Techniques : NLP (TF-IDF, Word2Vec, BERT), Classification (Naive Bayes, SVM, LSTM, Transformers), Topic Modeling (LDA)
-- Métriques : Accuracy, F1-Score, AUC-ROC, Confusion Matrix
-
----
-
-## ⚠️ Défis techniques identifiés
-
-- **Déséquilibre des classes** : Majorité de notes 5 étoiles
-- **Valeurs aberrantes** : Durées irréalistes, nutrition extrême
-- **Parsing nécessaire** : Colonne nutrition au format string → conversion en liste
-- **Jointure requise** : Entre RAW_recipes.csv et RAW_interactions.csv pour analyses complètes
-
----
-
-## 🌿 Stratégie de branches Git
-
-Ce projet utilise le modèle **Git Flow** pour une collaboration structurée et efficace.
-
-### Structure des branches
-
-```
-master (main)
-  └── develop
-       ├── feature/data-exploration
-       ├── feature/data-preprocessing
-       ├── feature/recommendation-system
-       ├── feature/prediction-model
-       ├── feature/sentiment-analysis
-       └── feature/...
-```
-
-### Description des branches
-
-#### `master`
-- **Rôle** : Branche de production contenant le code stable et testé
-- **Protection** : Protégée, accepte uniquement les merges depuis `develop` via Pull Requests
-- **Règle** : Ne jamais commiter directement sur `master`
-
-#### `develop`
-- **Rôle** : Branche d'intégration principale pour le développement
-- **Protection** : Protégée, accepte les merges depuis les branches `feature/`
-- **Workflow** : Toutes les fonctionnalités convergent ici avant d'être déployées en production
-
-#### `feature/*`
-- **Rôle** : Branches de développement pour des fonctionnalités spécifiques
-- **Convention de nommage** : `feature/nom-descriptif-de-la-feature`
-- **Cycle de vie** :
-  1. Créée depuis `develop`
-  2. Développement de la fonctionnalité
-  3. Pull Request vers `develop`
-  4. Supprimée après merge
-
-### Branches suggérées pour le projet
-
-- `feature/data-exploration` : Analyse exploratoire des données
-- `feature/data-preprocessing` : Nettoyage et préparation des données
-- `feature/recommendation-system` : Système de recommandation
-- `feature/prediction-model` : Modèle de prédiction de notes
-- `feature/sentiment-analysis` : Analyse de sentiments des avis
-- `feature/api-development` : Développement API
-- `feature/deployment` : Configuration déploiement
-
----
-
-## 🚀 Guide de démarrage
-
-### Prérequis
-
-- Git installé
-- Python 3.8+
-- Compte GitHub avec accès au repository
-
-### Configuration initiale
-
-#### 1. Cloner le repository
+### Step 1: Download the Project
 
 ```bash
-git clone https://github.com/[votre-organisation]/mongetamain.git
-cd mongetamain
+# Clone the project from GitHub
+git clone https://github.com/[your-organization]/mangetamain.git
+cd mangetamain
 ```
 
-#### 2. Vérifier les branches disponibles
+### Step 2: Install Dependencies
 
 ```bash
-git branch -a
+# Install required Python packages
+pip install -r requirements.txt
 ```
 
-#### 3. Créer et configurer les branches principales
+### Step 3: Prepare Your Data
 
-**Créer la branche `develop`** (à faire une seule fois par le chef de projet)
+1. Download the recipe dataset from [Kaggle - Food.com Recipes](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions)
+2. Place the following files in the `data/` folder:
+   - `RAW_recipes.csv` - Contains all recipe information
+   - `RAW_interactions.csv` - Contains user ratings and reviews
+
+### Step 4: Launch the Application
 
 ```bash
-git checkout -b develop
-git push -u origin develop
+# Start the web application
+streamlit run streamlit_app_final.py
+```
+
+The application will open in your web browser automatically!
+
+---
+
+## How to Use MangeTaMain
+
+### Discovering New Recipes
+
+**Option 1: Get Personalized Suggestions**
+1. Navigate to "Personalized Recommendations"
+2. Enter your User ID (or try one of the sample IDs provided)
+3. Choose how many recipe suggestions you want (5-20)
+4. Apply filters if you have specific needs:
+   - Maximum cooking time
+   - High protein recipes
+   - Low calorie options
+5. Click "Get Recommendations"
+
+**Option 2: Find Similar Recipes**
+1. Go to "Recipe-Based Recommendations"
+2. Search for a recipe you like (e.g., "chocolate cake", "pasta carbonara")
+3. Select the recipe from the search results
+4. Click "Find Similar Recipes" to discover comparable options
+
+### Understanding Cooking Time
+
+Want to know how long a recipe will take?
+
+1. Navigate to "Cooking Time Prediction"
+2. **Enter New Recipe**: Input your recipe details (steps, ingredients, cooking methods)
+3. **Search Existing Recipe**: Find a recipe from our database
+4. Get an instant time estimate to help with meal planning
+
+### Checking Nutritional Information
+
+1. Go to "Nutrition Information"
+2. **Enter Values**: Input nutritional data for any recipe
+3. **Search Recipe**: Find an existing recipe in the database
+4. See instant categorization:
+   - High/Low Calorie
+   - High Protein
+   - Low Fat
+   - Low Sugar
+   - Overall Health Score
+
+### Exploring Recipe Categories
+
+1. Visit "Recipe Categories"
+2. **Classify Your Recipe**: Enter recipe characteristics to find its category
+3. **View Overview**: Explore different recipe types:
+   - Quick & Simple meals
+   - Healthy & Balanced options
+   - Elaborate dishes
+   - Desserts & Treats
+   - Complex recipes
+
+### Reading User Reviews
+
+1. Navigate to "Review Analysis"
+2. **Write Your Own**: Get instant sentiment analysis on your review
+3. **Analyze Existing**: Enter a Recipe ID to see what others think
+4. View overall sentiment (Positive, Neutral, Negative)
+
+### Exploring the Dataset
+
+Visit "Dataset Insights" to:
+- See overall statistics about our recipe collection
+- Explore cooking time distributions
+- Understand recipe complexity patterns
+- View nutritional trends
+
+---
+
+## Understanding Your Results
+
+### Recipe Cards
+
+Each recipe recommendation shows:
+- **Recipe Name**: The dish you'll be making
+- **Time**: How long it takes to prepare
+- **Steps**: Number of cooking steps
+- **Ingredients**: How many ingredients you'll need
+- **Calories**: Per serving
+- **Categories**: Health tags and recipe type
+
+### Recommendation Types
+
+- **Personalized**: Based on your past preferences and similar users
+- **Popular**: Highly-rated recipes loved by the community
+- **Content-Based**: Similar to recipes you already enjoy
+
+### Health Categories
+
+- **High Protein**: Great for fitness and muscle building
+- **Low Calorie**: Perfect for weight management
+- **Low Fat**: Heart-healthy options
+- **Low Sugar**: Diabetic-friendly or sugar-conscious choices
+- **Healthy Recipe**: Overall nutritious and balanced
+
+### Recipe Categories
+
+- **Quick & Simple**: Fast meals for busy days (15-30 minutes)
+- **Healthy & Balanced**: Nutritious everyday options
+- **Elaborate Meals**: Special occasion cooking (60+ minutes)
+- **Complex Dishes**: Advanced techniques for cooking enthusiasts
+
+---
+
+## Tips for Best Results
+
+### Getting Better Recommendations
+
+1. **Be Active**: The more recipes you rate, the better your suggestions become
+2. **Use Filters**: Narrow down results based on your needs (time, nutrition)
+3. **Try Both Modes**: User-based for variety, recipe-based for similar dishes
+4. **Explore Categories**: Find recipes that match your cooking style
+
+### Planning Your Meals
+
+1. **Check Time Estimates**: Use the cooking time prediction before shopping
+2. **Review Nutrition**: Ensure recipes fit your dietary goals
+3. **Read Reviews**: See what challenges others faced
+4. **Start Simple**: Try quick recipes first, then explore complex ones
+
+### Finding the Right Recipe
+
+1. **Search Broadly**: Use general terms like "chicken" or "pasta"
+2. **Apply Filters**: Add time or nutrition constraints
+3. **Compare Options**: Look at multiple suggestions before deciding
+4. **Check Ingredients**: Make sure you have what you need
+
+---
+
+## Dataset Information
+
+MangeTaMain is powered by comprehensive recipe data:
+
+- **230,000+ Recipes**: From Food.com community
+- **1,000,000+ Reviews**: Real user feedback and ratings
+- **18 Years of Data**: Recipe trends from 2000-2018
+- **Detailed Information**: Ingredients, steps, nutrition, cooking time
+
+### What Each Recipe Includes
+
+- Ingredient list and quantities
+- Step-by-step cooking instructions
+- Preparation and cooking time
+- Nutritional information (calories, protein, fat, sugar, etc.)
+- User ratings and reviews
+- Recipe tags and categories
+
+---
+
+## Frequently Asked Questions
+
+**Q: Do I need to create an account?**
+A: Currently, you can explore recipes using existing User IDs from our dataset. Sample IDs are provided in the app.
+
+**Q: How accurate are the time predictions?**
+A: Our predictions are typically within 15 minutes of actual cooking time, based on recipe complexity and methods.
+
+**Q: Can I add my own recipes?**
+A: The current version works with existing recipes. Custom recipe support may be added in future updates.
+
+**Q: What if I have dietary restrictions?**
+A: Use the nutrition filters to find recipes that match your needs (low calorie, high protein, etc.).
+
+**Q: How are recommendations generated?**
+A: We analyze your preferences and compare them with similar users who enjoyed recipes you haven't tried yet.
+
+**Q: Can I save my favorite recipes?**
+A: This feature is planned for future releases. Currently, note down Recipe IDs you like.
+
+---
+
+## Troubleshooting
+
+### Application Won't Start
+
+1. Check that Python 3.8+ is installed: `python --version`
+2. Verify all dependencies are installed: `pip install -r requirements.txt`
+3. Ensure data files are in the correct location
+
+### No Recommendations Showing
+
+1. Try a different User ID
+2. Remove strict filters (time, nutrition)
+3. Increase the number of recommendations requested
+4. Check that data files are loaded correctly
+
+### Slow Performance
+
+1. Reduce the number of recommendations (try 5-10 instead of 20)
+2. Disable enrichment temporarily
+3. Close other applications to free up memory
+
+---
+
+## Project Structure
+
+```
+mangetamain/
+├── data/                       # Recipe and user data
+│   ├── RAW_recipes.csv        # All recipe information
+│   └── RAW_interactions.csv   # User ratings and reviews
+├── src/                       # Application source code
+│   ├── integration/           # Core recommendation system
+│   ├── modeling/              # Prediction and analysis
+│   └── sentiment_analysis/    # Review analysis
+├── outputs/                   # Saved results
+├── streamlit_app_final.py    # Main application
+├── requirements.txt          # Python dependencies
+└── README.md                 # This guide
 ```
 
 ---
 
-## 📖 Workflow de développement
+## Support and Feedback
 
-### Pour démarrer une nouvelle fonctionnalité
+Having issues or suggestions? Here's how to get help:
 
-#### 1. Se positionner sur `develop` et mettre à jour
-
-```bash
-git checkout develop
-git pull origin develop
-```
-
-#### 2. Créer une branche feature
-
-```bash
-git checkout -b feature/nom-de-votre-feature
-```
-
-#### 3. Développer et commiter régulièrement
-
-```bash
-git add .
-git commit -m "Description claire du changement"
-```
-
-#### 4. Pousser la branche sur GitHub
-
-```bash
-git push -u origin feature/nom-de-votre-feature
-```
-
-#### 5. Créer une Pull Request
-
-1. Aller sur GitHub
-2. Cliquer sur "Compare & pull request"
-3. Base : `develop` ← Compare : `feature/nom-de-votre-feature`
-4. Ajouter une description détaillée
-5. Assigner des reviewers
-6. Soumettre la PR
-
-#### 6. Après approbation et merge
-
-```bash
-git checkout develop
-git pull origin develop
-git branch -d feature/nom-de-votre-feature
-```
-
-### Pour mettre en production
-
-#### 1. Depuis `develop` vers `master`
-
-```bash
-git checkout master
-git pull origin master
-git merge develop
-git push origin master
-```
-
-#### 2. Créer un tag de version (optionnel mais recommandé)
-
-```bash
-git tag -a v1.0.0 -m "Version 1.0.0 - Système de recommandation initial"
-git push origin v1.0.0
-```
+1. **Check this guide**: Most common questions are answered here
+2. **Review error messages**: They often point to the solution
+3. **Open an issue**: Report bugs or request features on GitHub
+4. **Contact the team**: Reach out to the project maintainers
 
 ---
 
-## 🔄 Bonnes pratiques Git
+## What's Next?
 
-### Commits
+MangeTaMain is continuously improving! Planned features include:
 
-- **Messages clairs et descriptifs** en français ou anglais (selon convention équipe)
-- **Format suggéré** :
-  ```
-  [TYPE] Sujet court (50 chars max)
-
-  Description détaillée si nécessaire
-
-  Type: feat, fix, docs, refactor, test, chore
-  ```
-
-### Pull Requests
-
-- **Titre explicite** résumant la fonctionnalité
-- **Description complète** incluant :
-  - Objectif de la PR
-  - Changements effectués
-  - Tests réalisés
-  - Captures d'écran si applicable
-- **Reviewers** : Au moins 1-2 membres de l'équipe
-- **Résoudre les conflits** avant de merger
-
-### Synchronisation régulière
-
-```bash
-# Récupérer les dernières modifications de develop
-git checkout develop
-git pull origin develop
-
-# Mettre à jour votre branche feature
-git checkout feature/votre-feature
-git merge develop
-# ou
-git rebase develop
-```
+- User account creation
+- Personal recipe collections
+- Shopping list generation
+- Meal planning calendar
+- Social sharing features
+- Mobile app version
 
 ---
 
-## 📁 Structure du projet (à définir)
+## Credits
 
-```
-mongetamain/
-├── data/
-│   ├── raw/                  # Données brutes
-│   ├── processed/            # Données nettoyées
-│   └── external/             # Données externes
-├── notebooks/                # Jupyter notebooks pour exploration
-├── src/
-│   ├── data/                 # Scripts de préparation des données
-│   ├── features/             # Feature engineering
-│   ├── models/               # Modèles ML
-│   └── visualization/        # Visualisations
-├── tests/                    # Tests unitaires
-├── docs/                     # Documentation
-├── requirements.txt          # Dépendances Python
-├── .gitignore
-└── README.md
-```
-
-```
-data/
-├── raw/                    # Données brutes (originales)
-│   ├── interactions_test.csv
-│   ├── interactions_train.csv
-│   ├── interactions_validation.csv
-│   ├── PP_recipes.csv
-│   ├── PP_users.csv
-│   ├── RAW_interactions.csv
-│   └── RAW_recipes.csv
-├── processed/              # Données traitées
-│   ├── cleaned_interactions.csv
-│   ├── cleaned_recipes.csv
-│   └── features/
-└── README.md              # Ce fichier
-```
-
-## Instructions
-
-1. **Placez vos fichiers CSV dans le dossier `raw/`**
-2. Les données traitées seront automatiquement sauvegardées dans `processed/`
-3. N'éditez jamais les fichiers dans `raw/` - ils servent de référence
+MangeTaMain is built on:
+- **Dataset**: Food.com Recipes and Interactions (Kaggle)
+- **Technology**: Python, Streamlit, and open-source tools
+- **Community**: Contributions from home cooks and developers
 
 ---
 
-## 👥 Organisation de l'équipe
+## License and Terms
 
-### Rôles suggérés
-
-- **Chef de projet** : Coordination, gestion des branches principales
-- **Data Engineers** : Préparation et nettoyage des données
-- **Data Scientists** : Développement des modèles
-- **ML Engineers** : Déploiement et API
-- **Reviewers** : Validation du code et des analyses
-
-### Communication
-
-- **Daily standup** : Synchronisation quotidienne
-- **Code review** : Obligatoire sur toutes les PR
-- **Documentation** : Mise à jour continue dans `/docs`
+This project is for educational and personal use. Recipe data is courtesy of Food.com and Kaggle.
 
 ---
 
-## 📚 Ressources
+**Last Updated**: 2025-10-28
 
-- [Documentation Git Flow](https://nvie.com/posts/a-successful-git-branching-model/)
-- [Dataset Kaggle](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions)
-- [Guide des Pull Requests GitHub](https://docs.github.com/en/pull-requests)
+**Version**: 2.0.0
 
 ---
 
-## 📝 Prochaines étapes
-
-1. ✅ Créer les branches `master` et `develop`
-2. ⬜ Télécharger et placer les datasets dans `/data/raw/`
-3. ⬜ Créer la première branche `feature/data-exploration`
-4. ⬜ Effectuer l'analyse exploratoire initiale
-5. ⬜ Documenter les findings
-6. ⬜ Première PR vers `develop`
-
----
-
-## 🤝 Contribution
-
-Chaque membre de l'équipe est encouragé à :
-- Suivre le workflow Git Flow
-- Documenter son code
-- Écrire des tests
-- Participer aux code reviews
-- Partager ses connaissances
-
----
-
-## 📞 Contact
-
-Pour toute question sur le projet ou le workflow Git, contactez le chef de projet ou créez une issue GitHub.
-
----
-
-**Dernière mise à jour** : 2025-10-07
+Enjoy cooking with MangeTaMain! Happy cooking! 👨‍🍳👩‍🍳
