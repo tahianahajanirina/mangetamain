@@ -1,0 +1,157 @@
+name: ML Pipeline - Full Training
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      skip_data_download:
+        description: 'Skip data download (use existing data)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+  
+  # Scheduled run (weekly on Sunday at 2 AM)
+  schedule:
+    - cron: '0 2 * * 0'
+  
+  # Only on main branch pushes with specific paths
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'scripts/**'
+      - 'pyproject.toml'
+
+jobs:
+  ml-pipeline:
+    name: ML Training Pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-ml-${{ hashFiles('pyproject.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-ml-
+    
+    - name: Cache Hugging Face models
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/huggingface
+        key: ${{ runner.os }}-huggingface-${{ hashFiles('train_sentiment_model.py') }}
+        restore-keys: |
+          ${{ runner.os }}-huggingface-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[sentiment]"
+        pip install kaggle
+    
+    - name: Setup Kaggle credentials
+      env:
+        KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+        KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+      run: |
+        mkdir -p ~/.kaggle
+        echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_KEY\"}" > ~/.kaggle/kaggle.json
+        chmod 600 ~/.kaggle/kaggle.json
+    
+    - name: Download dataset from Kaggle
+      if: ${{ github.event.inputs.skip_data_download != 'true' }}
+      run: |
+        python scripts/download_kaggle_data.py
+    
+    - name: Verify data files
+      run: |
+        ls -lh data/raw/
+        echo "Data files present:"
+        ls data/raw/*.csv
+    
+    - name: Step 1 - Clean data
+      run: |
+        echo "::group::Cleaning data"
+        python scripts/clean_data.py
+        echo "::endgroup::"
+    
+    - name: Step 2 - Recipe pipeline
+      run: |
+        echo "::group::Running recipe pipeline"
+        python scripts/run_recipe_pipeline.py
+        echo "::endgroup::"
+    
+    - name: Step 3 - Nutrition classification pipeline
+      run: |
+        echo "::group::Running nutrition classification pipeline"
+        python scripts/run_nutrition_pipeline.py
+        echo "::endgroup::"
+    
+    - name: Step 4 - Nutrition tagging
+      run: |
+        echo "::group::Running nutrition tagging"
+        python main_nutrition_tagging.py
+        echo "::endgroup::"
+    
+    - name: Step 5 - Time prediction
+      run: |
+        echo "::group::Running time prediction"
+        python main_time_prediction.py
+        echo "::endgroup::"
+    
+    - name: Step 6 - Train sentiment model
+      run: |
+        echo "::group::Training sentiment analysis model"
+        python train_sentiment_model.py
+        echo "::endgroup::"
+    
+    - name: List generated models
+      run: |
+        echo "Generated models:"
+        ls -lh outputs/models/
+    
+    - name: Upload trained models
+      uses: actions/upload-artifact@v3
+      with:
+        name: trained-models-${{ github.run_number }}
+        path: |
+          outputs/models/
+          outputs/sentiment_model/
+        retention-days: 30
+    
+    - name: Upload figures and reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: ml-outputs-${{ github.run_number }}
+        path: |
+          outputs/figures/
+          outputs/reports/
+        retention-days: 7
+    
+    - name: Generate pipeline summary
+      if: always()
+      run: |
+        echo "## ML Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Generated Models" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        ls -lh outputs/models/ >> $GITHUB_STEP_SUMMARY || echo "No models found" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Pipeline Status" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Completed at $(date)" >> $GITHUB_STEP_SUMMARY

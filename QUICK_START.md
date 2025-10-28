@@ -10,7 +10,8 @@ pip install uv
 uv pip install -e ".[sentiment]"
 
 # 3. Generate clustering models (REQUIRED - takes ~10 min)
-python run_clustering_models.py
+python scripts/clean_data.py 
+python scripts/run_recipe_pipeline.py
 
 # 4. (Optional) Train sentiment model (~30 min with GPU, ~2-3 hours CPU)
 # python train_sentiment_model.py
@@ -27,7 +28,8 @@ If you want to start quickly without sentiment analysis:
 
 ```bash
 uv pip install -e .
-python run_clustering_models.py
+python scripts/clean_data.py 
+python scripts/run_recipe_pipeline.py
 streamlit run streamlit_app_final.py
 ```
 

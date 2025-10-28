@@ -33,8 +33,15 @@ dev = [
     "jupyter>=1.0.0",
     "ipython>=8.12.0",
     "pytest>=7.3.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.0",
     "black>=23.0.0",
     "ruff>=0.1.0",
+]
+test = [
+    "pytest>=7.3.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.0",
 ]
 sentiment = [
     "transformers>=4.30.0",
@@ -60,3 +67,40 @@ recipe-nutrition-tagging = "main_nutrition_tagging:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
