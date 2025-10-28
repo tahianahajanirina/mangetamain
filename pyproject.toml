@@ -46,6 +46,7 @@ test = [
 sentiment = [
     "transformers>=4.30.0",
     "torch>=2.0.0",
+    "accelerate>=0.26.0",
 ]
 
 [build-system]
