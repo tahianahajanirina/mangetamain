@@ -91,8 +91,14 @@ print("\n" + "=" * 80)
 print("SAMPLING DATA")
 print("=" * 80)
 
-SAMPLE_SIZE = 50000  # Adjust based on your resources
-print(f"\nTarget sample size: {SAMPLE_SIZE:,}")
+# Detect if running on CI/CD
+import os
+IS_CI = os.getenv('CI') == 'true' or os.getenv('GITHUB_ACTIONS') == 'true'
+
+# Adjust sample size based on environment
+SAMPLE_SIZE = 5000 if IS_CI else 50000  # Much smaller for CI/CD
+print(f"\nEnvironment: {'CI/CD' if IS_CI else 'Local'}")
+print(f"Target sample size: {SAMPLE_SIZE:,}")
 
 if len(df_clean) > SAMPLE_SIZE:
     # Stratified sampling
@@ -233,9 +239,12 @@ print("=" * 80)
 output_dir = Path(__file__).parent / "outputs" / "sentiment_model"
 output_dir.mkdir(parents=True, exist_ok=True)
 
+# Adjust epochs based on environment
+num_epochs = 1 if IS_CI else 3
+
 training_args = TrainingArguments(
     output_dir=str(output_dir),
-    num_train_epochs=3,  # Reduced from 5 for faster training
+    num_train_epochs=num_epochs,  # Reduced for CI/CD
     per_device_train_batch_size=16 if torch.cuda.is_available() else 8,
     per_device_eval_batch_size=32 if torch.cuda.is_available() else 16,
     warmup_steps=500,

@@ -30,7 +30,6 @@ jobs:
   ml-pipeline:
     name: ML Training Pipeline
     runs-on: ubuntu-latest
-    timeout-minutes: 120
     
     steps:
     - name: Checkout code
