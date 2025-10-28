@@ -63,8 +63,11 @@ def main():
         # Visualiser
         clusterer.plot_clusters(output_dir=str(OUTPUTS_FIGURES))
         
-        # Sauvegarder
+        # Sauvegarder résultats (CSV)
         clusterer.save_results(str(output_path))
+        
+        # Sauvegarder modèle (.pkl)
+        model_name = clusterer.save_model()
         
         # Afficher les stats
         stats = clusterer.get_stats()
@@ -83,7 +86,8 @@ def main():
             print(f"  {cluster_id}. \"{name}\": {count:,} ({pct:.1f}%)")
         
         print("\n✓ Clustering terminé avec succès!")
-        print(f"  Fichier: {output_path}")
+        print(f"  Résultats CSV: {output_path}")
+        print(f"  Modèle .pkl: outputs/models/{model_name}_*.pkl")
         print(f"  Visualisation: {OUTPUTS_FIGURES / '07c_recipes_clusters_pca_v3.png'}")
         
     except Exception as e:

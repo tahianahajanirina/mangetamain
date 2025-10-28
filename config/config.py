@@ -10,18 +10,21 @@ from typing import Dict, List, Any
 # Project paths
 PROJECT_ROOT = Path(__file__).parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
+DATA_RAW = DATA_DIR / "raw"
+DATA_PROCESSED = DATA_DIR / "processed"
 OUTPUT_DIR = PROJECT_ROOT / "outputs"
 MODEL_DIR = OUTPUT_DIR / "models"
 FIGURE_DIR = OUTPUT_DIR / "figures"
+OUTPUTS_FIGURES = FIGURE_DIR  # Alias for compatibility
 REPORT_DIR = OUTPUT_DIR / "reports"
 
-# Additional paths for clustering
-DATA_PROCESSED = DATA_DIR  # Processed data in data directory
-OUTPUTS_FIGURES = FIGURE_DIR  # Figures in outputs/figures
+DATA_RAW = DATA_DIR / "raw"
+DATA_PROCESSED = DATA_DIR / "processed"
+OUTPUTS_FIGURES = FIGURE_DIR
 
 # Data files
-RAW_DATA_FILE = DATA_DIR / "RAW_recipes.csv"
-PROCESSED_DATA_FILE = DATA_DIR / "processed_recipes.csv"
+RAW_DATA_FILE = DATA_RAW / "RAW_recipes.csv"
+PROCESSED_DATA_FILE = DATA_PROCESSED / "processed_recipes.csv"
 
 # Task configurations
 TASK_CONFIG = {

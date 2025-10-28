@@ -20,6 +20,8 @@ import sys
 import logging
 import time
 import os
+import json
+import joblib
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -100,11 +102,11 @@ logger = logging.getLogger(__name__)
 @st.cache_resource
 def load_pipeline():
     """Load and cache the recipe discovery system."""
-    with st.spinner("🔄 Loading recipe database..."):
+    with st.spinner("Loading recipe database..."):
         try:
             pipeline = IntegratedRecommendationPipeline(
-                recipes_path="data/RAW_recipes.csv",
-                interactions_path="data/RAW_interactions.csv",
+                recipes_path="data/raw/RAW_recipes.csv",
+                interactions_path="data/raw/RAW_interactions.csv",
                 models_dir="outputs/models",
                 load_models=True
             )
@@ -170,7 +172,7 @@ def main():
         tab_selection = st.radio(
             "Where would you like to go?",
             [
-                "🏠 Home & Getting Started",
+                "🏠 Home",
                 "🎯 Find Recipes",
                 "🤖 Recipe Chatbot",
                 "⏰ Cooking Time",
@@ -1322,7 +1324,7 @@ def show_clustering_page(pipeline):
         return
 
     # Tabs for different views
-    tab1, tab2 = st.tabs(["✏️ Find My Category", "📈 Browse All Categories"])
+    tab1, tab2, tab3 = st.tabs(["✏️ Find My Category", "📈 Browse All Categories", "🥗 Nutrition Classification"])
 
     with tab1:
         st.markdown("### ✏️ Find Your Recipe's Cluster")
@@ -1510,6 +1512,340 @@ def show_clustering_page(pipeline):
 
         except Exception as e:
             st.error(f"Error loading cluster data: {e}")
+
+    with tab3:
+        st.markdown("### 🥗 Nutrition Classification")
+        st.markdown("Classify recipes into 4 nutritional categories using supervised machine learning.")
+
+        # Load nutrition classifier model
+        @st.cache_resource
+        def load_nutrition_classifier():
+            """Load the nutrition classification model."""
+            try:
+                model_dir = Path('outputs/models')
+                
+                # Find latest nutrition classifier model
+                metadata_files = list(model_dir.glob('nutrition_classifier_*_metadata.json'))
+                
+                if not metadata_files:
+                    return None, None
+                
+                latest = max(metadata_files, key=lambda p: p.stat().st_mtime)
+                
+                with open(latest, 'r') as f:
+                    metadata = json.load(f)
+                
+                model_name = metadata['model_name']
+                
+                # Load model and scaler
+                model = joblib.load(model_dir / f"{model_name}_model.pkl")
+                scaler = joblib.load(model_dir / f"{model_name}_scaler.pkl")
+                
+                return model, scaler, metadata
+            except Exception as e:
+                logger.error(f"Error loading nutrition classifier: {e}")
+                return None, None, None
+
+        model, scaler, metadata = load_nutrition_classifier()
+
+        if model is None:
+            st.warning("⚠️ Nutrition classification model not available.")
+            st.info("""
+            To use this feature, you need to train the nutrition classifier first.
+            
+            Run the following command:
+            ```bash
+            python scripts/run_nutrition_pipeline.py --model-type random_forest
+            ```
+            """)
+        else:
+            st.success(f"✅ Nutrition classifier loaded successfully!")
+            
+            # Display model info
+            with st.expander("📊 Model Information", expanded=False):
+                col1, col2, col3, col4 = st.columns(4)
+                
+                with col1:
+                    st.metric("Model Type", metadata.get('model_type', 'N/A').replace('_', ' ').title())
+                with col2:
+                    st.metric("Features", metadata.get('n_features', 'N/A'))
+                with col3:
+                    st.metric("CV F1-Score", f"{metadata.get('cv_f1_mean', 0):.4f}")
+                with col4:
+                    st.metric("Categories", len(metadata.get('class_names', [])))
+                
+                st.markdown("**Category Labels:**")
+                for i, class_name in enumerate(metadata.get('class_names', [])):
+                    st.markdown(f"- **{i}**: {class_name}")
+
+            st.markdown("---")
+
+            # Input form for nutrition classification
+            st.markdown("### 📝 Enter Recipe Nutrition Information")
+            
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.markdown("**Macronutrients**")
+                calories = st.number_input("Calories", min_value=0, max_value=5000, value=300, key="nutr_cal")
+                protein = st.number_input("Protein (g)", min_value=0.0, max_value=500.0, value=15.0, key="nutr_prot")
+                total_fat = st.number_input("Total Fat (g)", min_value=0.0, max_value=500.0, value=10.0, key="nutr_fat")
+                saturated_fat = st.number_input("Saturated Fat (g)", min_value=0.0, max_value=200.0, value=3.0, key="nutr_sat")
+            
+            with col2:
+                st.markdown("**Carbs & Sugar**")
+                carbohydrates = st.number_input("Carbohydrates (g)", min_value=0.0, max_value=500.0, value=40.0, key="nutr_carb")
+                sugar = st.number_input("Sugar (g)", min_value=0.0, max_value=200.0, value=5.0, key="nutr_sugar")
+                sodium = st.number_input("Sodium (mg)", min_value=0, max_value=10000, value=400, key="nutr_sodium")
+            
+            with col3:
+                st.markdown("**Recipe Details**")
+                nutr_steps = st.number_input("Number of Steps", min_value=1, max_value=100, value=8, key="nutr_steps")
+                nutr_ingredients = st.number_input("Number of Ingredients", min_value=1, max_value=100, value=10, key="nutr_ingr")
+                nutr_minutes = st.number_input("Cooking Time (min)", min_value=1, max_value=1000, value=30, key="nutr_min")
+
+            if st.button("🎯 Classify Nutrition Category", type="primary", use_container_width=True, key="classify_nutrition"):
+                with st.spinner("Classifying recipe..."):
+                    try:
+                        # Calculate all required features
+                        # PDV percentages (based on FDA daily values)
+                        calories_pdv = (calories / 2000) * 100
+                        fat_pdv = (total_fat / 78) * 100
+                        saturated_fat_pdv = (saturated_fat / 20) * 100
+                        sodium_pdv = (sodium / 2300) * 100
+                        carbs_pdv = (carbohydrates / 275) * 100
+                        sugar_pdv = (sugar / 50) * 100
+                        protein_pdv = (protein / 50) * 100
+                        
+                        # Ratios
+                        protein_density = protein / max(calories, 1) * 100
+                        sugar_ratio = sugar / max(carbohydrates, 1) * 100
+                        sodium_density = sodium / max(calories, 1)
+                        saturated_fat_ratio = saturated_fat / max(total_fat, 1) * 100
+                        
+                        # Macro balance (ideal: 30% protein, 30% fat, 40% carbs)
+                        protein_cal = protein * 4
+                        carb_cal = carbohydrates * 4
+                        fat_cal = total_fat * 9
+                        total_cal = max(protein_cal + carb_cal + fat_cal, 1)
+                        
+                        protein_pct = (protein_cal / total_cal) * 100
+                        carbs_pct = (carb_cal / total_cal) * 100
+                        fat_pct = (fat_cal / total_cal) * 100
+                        
+                        macro_balance = 100 - (abs(protein_pct - 30) + abs(fat_pct - 30) + abs(carbs_pct - 40)) / 3
+                        
+                        # Health score (custom formula)
+                        health_score = max(0, 
+                            protein_pdv * 0.3 - 
+                            sugar_pdv * 0.25 - 
+                            saturated_fat_pdv * 0.25 - 
+                            sodium_pdv * 0.2
+                        )
+                        
+                        # Binary features
+                        is_low_calorie = 1 if calories < 200 else 0
+                        is_high_protein = 1 if protein_pdv > 30 else 0
+                        is_low_fat = 1 if fat_pdv < 10 else 0
+                        is_low_sodium = 1 if sodium_pdv < 20 else 0
+                        is_low_sugar = 1 if sugar_pdv < 10 else 0
+                        
+                        # Complexity and interactions
+                        complexity_score = (nutr_steps * nutr_ingredients) / max(nutr_minutes, 1)
+                        calorie_protein_interaction = calories * protein_pdv
+                        fat_sodium_interaction = fat_pdv * sodium_pdv
+                        
+                        # Create feature vector matching training data
+                        features = {
+                            'calories': calories,
+                            'total_fat': total_fat,
+                            'saturated_fat': saturated_fat,
+                            'sodium': sodium,
+                            'carbohydrates': carbohydrates,
+                            'sugar': sugar,
+                            'protein': protein,
+                            'calories_pdv': calories_pdv,
+                            'fat_pdv': fat_pdv,
+                            'saturated_fat_pdv': saturated_fat_pdv,
+                            'sodium_pdv': sodium_pdv,
+                            'carbs_pdv': carbs_pdv,
+                            'sugar_pdv': sugar_pdv,
+                            'protein_pdv': protein_pdv,
+                            'protein_density': protein_density,
+                            'sugar_ratio': sugar_ratio,
+                            'sodium_density': sodium_density,
+                            'saturated_fat_ratio': saturated_fat_ratio,
+                            'macro_balance': macro_balance,
+                            'health_score': health_score,
+                            'is_low_calorie': is_low_calorie,
+                            'is_high_protein': is_high_protein,
+                            'is_low_fat': is_low_fat,
+                            'is_low_sodium': is_low_sodium,
+                            'is_low_sugar': is_low_sugar,
+                            'complexity_score': complexity_score,
+                            'calorie_protein_interaction': calorie_protein_interaction,
+                            'fat_sodium_interaction': fat_sodium_interaction,
+                            'n_steps': nutr_steps,
+                            'n_ingredients': nutr_ingredients,
+                            'minutes': nutr_minutes
+                        }
+                        
+                        # Create DataFrame with features in correct order
+                        X_new = pd.DataFrame([features])[metadata['feature_names']]
+                        
+                        # Scale and predict
+                        X_scaled = scaler.transform(X_new)
+                        prediction = model.predict(X_scaled)[0]
+                        probabilities = model.predict_proba(X_scaled)[0]
+                        
+                        # Get class name
+                        class_names = metadata['class_names']
+                        predicted_class = class_names[prediction]
+                        
+                        # Display results
+                        st.markdown("---")
+                        st.markdown("### 🎯 Classification Result")
+                        
+                        # Main result
+                        result_colors = {
+                            'Very Healthy': '🟢',
+                            'Healthy': '🟡',
+                            'Moderate': '🟠',
+                            'Indulgent': '🔴'
+                        }
+                        
+                        color_emoji = result_colors.get(predicted_class, '⚪')
+                        
+                        st.markdown(f"""
+                        <div style='background-color: #E8F4F8; padding: 2rem; border-radius: 10px; border-left: 5px solid #4ECDC4; text-align: center;'>
+                            <h1 style='color: #4ECDC4; font-size: 3rem; margin: 0;'>{color_emoji} {predicted_class}</h1>
+                            <p style='font-size: 1.2rem; color: #666; margin-top: 0.5rem;'>Nutrition Category</p>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        
+                        # Confidence scores
+                        st.markdown("### 📊 Confidence Scores")
+                        
+                        for i, (class_name, prob) in enumerate(zip(class_names, probabilities)):
+                            col1, col2 = st.columns([3, 1])
+                            with col1:
+                                st.progress(prob)
+                            with col2:
+                                st.markdown(f"**{class_name}**: {prob*100:.1f}%")
+                        
+                        # Nutritional breakdown
+                        st.markdown("### 📈 Nutritional Breakdown")
+                        
+                        col1, col2, col3 = st.columns(3)
+                        
+                        with col1:
+                            st.markdown("**PDV Percentages**")
+                            st.metric("Calories", f"{calories_pdv:.1f}%")
+                            st.metric("Protein", f"{protein_pdv:.1f}%")
+                            st.metric("Fat", f"{fat_pdv:.1f}%")
+                        
+                        with col2:
+                            st.markdown("**Ratios**")
+                            st.metric("Protein Density", f"{protein_density:.2f}")
+                            st.metric("Sugar Ratio", f"{sugar_ratio:.1f}%")
+                            st.metric("Sat. Fat Ratio", f"{saturated_fat_ratio:.1f}%")
+                        
+                        with col3:
+                            st.markdown("**Scores**")
+                            st.metric("Health Score", f"{health_score:.1f}")
+                            st.metric("Macro Balance", f"{macro_balance:.1f}")
+                            st.metric("Complexity", f"{complexity_score:.2f}")
+                        
+                        # Macronutrient distribution
+                        st.markdown("### 🥧 Macronutrient Distribution")
+                        
+                        macro_data = pd.DataFrame({
+                            'Nutrient': ['Protein', 'Carbs', 'Fat'],
+                            'Percentage': [protein_pct, carbs_pct, fat_pct]
+                        })
+                        
+                        fig = px.pie(
+                            macro_data,
+                            values='Percentage',
+                            names='Nutrient',
+                            title='Calorie Distribution by Macronutrient',
+                            color_discrete_sequence=['#4ECDC4', '#FF6B6B', '#FFD93D']
+                        )
+                        
+                        st.plotly_chart(fig, use_container_width=True)
+                        
+                        # Interpretation
+                        st.markdown("### 💡 Interpretation")
+                        
+                        interpretations = {
+                            'Very Healthy': """
+                            This recipe is classified as **Very Healthy** 🟢
+                            
+                            Characteristics:
+                            - Excellent nutritional balance
+                            - Low in unhealthy components (sugar, saturated fat, sodium)
+                            - High in beneficial nutrients (protein, fiber)
+                            - Ideal for regular consumption
+                            """,
+                            'Healthy': """
+                            This recipe is classified as **Healthy** 🟡
+                            
+                            Characteristics:
+                            - Good nutritional profile
+                            - Moderate amounts of all nutrients
+                            - Suitable for regular meals
+                            - Generally balanced diet-friendly
+                            """,
+                            'Moderate': """
+                            This recipe is classified as **Moderate** 🟠
+                            
+                            Characteristics:
+                            - Average nutritional value
+                            - May have some higher amounts of calories, fat, or sodium
+                            - Enjoy in moderation
+                            - Balance with healthier meals
+                            """,
+                            'Indulgent': """
+                            This recipe is classified as **Indulgent** 🔴
+                            
+                            Characteristics:
+                            - Higher in calories, fat, sugar, or sodium
+                            - Meant for occasional enjoyment
+                            - Special occasions or treats
+                            - Balance with lighter meals throughout the day
+                            """
+                        }
+                        
+                        st.info(interpretations.get(predicted_class, ""))
+                        
+                        # Feature importance (if available)
+                        if hasattr(model, 'feature_importances_'):
+                            st.markdown("### 🔍 Top Contributing Features")
+                            
+                            feature_importance = pd.DataFrame({
+                                'Feature': metadata['feature_names'],
+                                'Importance': model.feature_importances_
+                            }).sort_values('Importance', ascending=False).head(10)
+                            
+                            fig = px.bar(
+                                feature_importance,
+                                x='Importance',
+                                y='Feature',
+                                orientation='h',
+                                title='Top 10 Most Important Features for Classification',
+                                color='Importance',
+                                color_continuous_scale='Viridis'
+                            )
+                            
+                            st.plotly_chart(fig, use_container_width=True)
+                        
+                    except Exception as e:
+                        st.error(f"❌ Classification error: {e}")
+                        logger.error(f"Nutrition classification error: {e}", exc_info=True)
+                        import traceback
+                        st.code(traceback.format_exc())
 
 
 def show_sentiment_page(pipeline):

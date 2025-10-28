@@ -1,8 +1,8 @@
 """
-Feature Engineering pour les Recettes (Clustering V3)
+Feature Engineering pour les Recettes (Clustering )
 
 Ce module construit les features recettes optimisées pour le clustering
-avec un objectif de silhouette >= 0.26
+
 """
 
 import pandas as pd
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class RecipeFeatureBuilder:
-    """Construit les features pour le clustering recettes V3"""
+    """Construit les features pour le clustering recettes """
     
     def __init__(self, min_rating: float = 3.5):
         """
@@ -82,9 +82,9 @@ class RecipeFeatureBuilder:
         return score
     
     def build_features(self, recipes_path: str, interactions_path: str) -> pd.DataFrame:
-        """Pipeline complet de construction des features recettes V3"""
+        """Pipeline complet de construction des features recettes """
         logger.info("=" * 80)
-        logger.info("CONSTRUCTION DES FEATURES RECETTES V3")
+        logger.info("CONSTRUCTION DES FEATURES RECETTES ")
         logger.info("=" * 80)
         
         # 1. Charger les données
@@ -99,7 +99,7 @@ class RecipeFeatureBuilder:
         recipes_filtered = recipes_merged[recipes_merged['avg_rating'] >= self.min_rating].copy()
         logger.info(f"Recettes conservées: {len(recipes_filtered):,} / {initial_count:,}")
         
-        # 4. Construire les 5 features V3
+        # 4. Construire les 5 features 
         logger.info("Création des features optimisées...")
         
         # Feature 1: popularity_score (log interactions * rating)
@@ -138,7 +138,7 @@ class RecipeFeatureBuilder:
         self.recipes_features = recipes_features
         
         logger.info("=" * 80)
-        logger.info(f"FEATURES RECETTES V3 CRÉÉES")
+        logger.info(f"FEATURES RECETTES  CRÉÉES")
         logger.info(f"  Recettes: {len(recipes_features):,}")
         logger.info(f"  Features: {len(features_cols) - 2}")  # -2 pour id et name
         logger.info("=" * 80)
@@ -170,8 +170,8 @@ class RecipeFeatureBuilder:
             'columns': list(self.recipes_features.columns)
         }
         
-        # Stats sur les features
-        feature_cols = ['popularity_score', 'log_minutes', 'time_complexity', 
+        # Stats sur les features (MODIFIÉ: health_category au lieu de popularity_score)
+        feature_cols = ['log_minutes', 'time_complexity', 
                        'efficiency', 'health_category']
         
         for col in feature_cols:
@@ -186,7 +186,7 @@ def build_recipe_features(recipes_path: str,
                          output_path: str = None,
                          min_rating: float = 3.5) -> pd.DataFrame:
     """
-    Helper function pour construire les features recettes V3.
+    Helper function pour construire les features recettes .
     
     Args:
         recipes_path: Chemin vers recipes_clean.csv
@@ -213,7 +213,7 @@ def main():
     # Chemins
     recipes_path = DATA_PROCESSED / 'recipes_clean.csv'
     interactions_path = DATA_PROCESSED / 'interactions_clean.csv'
-    output_path = DATA_PROCESSED / 'recipes_features_v3.csv'
+    output_path = DATA_PROCESSED / 'recipes_features_.csv'
     
     # Construire les features
     recipes_features = build_recipe_features(

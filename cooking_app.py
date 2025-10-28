@@ -82,8 +82,8 @@ def load_system():
     """Load the recipe system."""
     try:
         pipeline = IntegratedRecommendationPipeline(
-            recipes_path="data/RAW_recipes.csv",
-            interactions_path="data/RAW_interactions.csv",
+            recipes_path="data/raw/RAW_recipes.csv",
+            interactions_path="data/raw/RAW_interactions.csv",
             models_dir="outputs/models",
             load_models=True
         )

@@ -13,7 +13,7 @@ from pathlib import Path
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
-from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
+from sklearn.metrics import silhouette_score
 from typing import Dict, Tuple
 import logging
 import joblib
@@ -236,7 +236,11 @@ class RecipeClusterer:
             elif minutes > 50:
                 names.append('Elaborees')
             elif minutes > 35:
-                names.append('Moderees')
+                # Différencier selon la santé
+                if profile['health_category'] >= 2.5:
+                    names.append('Equilibrees')
+                else:
+                    names.append('Moderees')
             
             # Santé (critère important)
             if profile['health_category'] >= 2.8:
@@ -260,10 +264,10 @@ class RecipeClusterer:
             elif profile['efficiency'] < 1.0 and 'Lentes' not in names:
                 names.append('Peu Efficaces')
             
-            # Si pas assez de caractéristiques, utiliser "Equilibrees"
+            # Si pas assez de caractéristiques, utiliser "Standard"
             if len(names) < 2:
-                if 30 <= minutes <= 40 and 60 <= profile['time_complexity'] <= 80:
-                    names.insert(0, 'Equilibrees')
+                if 30 <= minutes <= 50 and 60 <= profile['time_complexity'] <= 90:
+                    names.insert(0, 'Standard')
             
             # Éliminer les doublons
             names = list(dict.fromkeys(names))
