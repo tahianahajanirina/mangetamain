@@ -46,10 +46,14 @@ uv.lock
 # Data
 data/*.csv
 data/*.pkl
+data/raw/*.csv
+data/processed/*.csv
+data/*.pkl
 !data/.gitkeep
 
 # Outputs
 outputs/models/*.pkl
+outputs/models/*.json
 outputs/figures/*.png
 outputs/figures/*.jpg
 outputs/reports/*.txt
