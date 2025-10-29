@@ -113,10 +113,10 @@ jobs:
           outputs/sentiment_model/**/*
         retention-days: 30
 
-  # Job 3: Build Docker with Models
+  # Job 3: Build Docker (Models downloaded at runtime from HF)
   build-docker:
-    name: Build Docker Image with Models
-    needs: [tests, ml-training]
+    name: Build Docker Image
+    needs: [tests]
     runs-on: ubuntu-latest
     if: always() && (needs.tests.result == 'success')
     permissions:
@@ -126,18 +126,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    # Download trained models from previous job
-    - name: Download trained models
-      uses: actions/download-artifact@v4
-      if: needs.ml-training.result == 'success'
-      with:
-        name: trained-models
-        path: outputs/
-    
-    - name: Verify models are present
-      run: |
-        echo "📦 Models in container:"
-        ls -lhR outputs/ || echo "⚠️ No models found (will use pre-existing)"
+    # NOTE: Models are NOT included in the image
+    # They will be downloaded from Hugging Face Hub at runtime
     
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -182,11 +172,9 @@ jobs:
         echo "### To deploy locally:" >> $GITHUB_STEP_SUMMARY
         echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
         echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
-        echo "docker run -p 8501:8501 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
+        echo "docker run -p 8501:8501 -e HF_MODEL_REPO=username/repo ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### To deploy on Streamlit Cloud:" >> $GITHUB_STEP_SUMMARY
-        echo "1. Go to https://share.streamlit.io" >> $GITHUB_STEP_SUMMARY
-        echo "2. Connect this repository" >> $GITHUB_STEP_SUMMARY
-        echo "3. Set main file: \`streamlit_app_final.py\`" >> $GITHUB_STEP_SUMMARY
-        echo "4. Deploy! 🎉" >> $GITHUB_STEP_SUMMARY
+        echo "### Environment Variables Needed:" >> $GITHUB_STEP_SUMMARY
+        echo "- \`HF_MODEL_REPO\`: Your Hugging Face model repository" >> $GITHUB_STEP_SUMMARY
+        echo "  (e.g., tahianahajanirina/mangetamain-models)" >> $GITHUB_STEP_SUMMARY

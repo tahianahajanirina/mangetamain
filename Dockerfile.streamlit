@@ -27,15 +27,18 @@ COPY --chown=app:app pyproject.toml README.md ./
 # Installer dépendances Python
 RUN pip install --user --no-cache-dir --upgrade pip setuptools wheel
 RUN pip install --user --no-cache-dir .[sentiment]
+RUN pip install --user --no-cache-dir huggingface_hub
 
 # Copier le code source
 COPY --chown=app:app src/ ./src/
 COPY --chown=app:app config/ ./config/
+COPY --chown=app:app scripts/download_models.py ./scripts/
 COPY --chown=app:app streamlit_app_final.py ./
 
-# Copier les modèles entraînés (depuis GitHub Actions artifacts)
-COPY --chown=app:app outputs/ ./outputs/
+# Create outputs directory structure
+RUN mkdir -p outputs/models outputs/sentiment_model
 
+# NOTE: Models will be downloaded at runtime from Hugging Face Hub
 # Copier les données nécessaires (si besoin)
 COPY --chown=app:app data/processed/ ./data/processed/
 
@@ -50,10 +53,10 @@ EXPOSE 8501
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl --fail http://localhost:8501/_stcore/health || exit 1
 
-# Commande de démarrage Streamlit
-CMD ["streamlit", "run", "streamlit_app_final.py", \
-     "--server.port=8501", \
-     "--server.address=0.0.0.0", \
-     "--server.headless=true", \
-     "--server.fileWatcherType=none", \
-     "--browser.gatherUsageStats=false"]
+# Commande de démarrage (download models puis start Streamlit)
+CMD python scripts/download_models.py && streamlit run streamlit_app_final.py \
+     --server.port=8501 \
+     --server.address=0.0.0.0 \
+     --server.headless=true \
+     --server.fileWatcherType=none \
+     --browser.gatherUsageStats=false
