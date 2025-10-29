@@ -1,0 +1,59 @@
+# Dockerfile optimisé pour déploiement Streamlit
+FROM python:3.11-slim
+
+# Métadonnées
+LABEL maintainer="mangetamain-project"
+LABEL description="Streamlit app pour recommandation de recettes Food.com avec ML"
+
+# Variables d'environnement
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Installation dépendances système minimales
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Créer utilisateur non-root
+RUN useradd --create-home --shell /bin/bash app
+USER app
+WORKDIR /home/app
+
+# Copier requirements
+COPY --chown=app:app pyproject.toml README.md ./
+
+# Installer dépendances Python
+RUN pip install --user --no-cache-dir --upgrade pip setuptools wheel
+RUN pip install --user --no-cache-dir .[sentiment]
+
+# Copier le code source
+COPY --chown=app:app src/ ./src/
+COPY --chown=app:app config/ ./config/
+COPY --chown=app:app streamlit_app_final.py ./
+
+# Copier les modèles entraînés (depuis GitHub Actions artifacts)
+COPY --chown=app:app outputs/ ./outputs/
+
+# Copier les données nécessaires (si besoin)
+COPY --chown=app:app data/processed/ ./data/processed/
+
+# Variables d'environnement
+ENV PATH="/home/app/.local/bin:${PATH}"
+ENV PYTHONPATH="/home/app:${PYTHONPATH}"
+
+# Port Streamlit
+EXPOSE 8501
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl --fail http://localhost:8501/_stcore/health || exit 1
+
+# Commande de démarrage Streamlit
+CMD ["streamlit", "run", "streamlit_app_final.py", \
+     "--server.port=8501", \
+     "--server.address=0.0.0.0", \
+     "--server.headless=true", \
+     "--server.fileWatcherType=none", \
+     "--browser.gatherUsageStats=false"]
