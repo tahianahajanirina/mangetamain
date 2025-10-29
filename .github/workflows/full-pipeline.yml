@@ -50,7 +50,6 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     if: github.event.inputs.skip_training != 'true'
-    timeout-minutes: 120
     
     steps:
     - uses: actions/checkout@v4
