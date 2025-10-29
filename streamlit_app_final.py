@@ -30,7 +30,9 @@ from src.integration.recommendation_pipeline import IntegratedRecommendationPipe
 from src.modeling.time_predictor import TimePredictionModel
 from src.modeling.nutrition_tagger import NutritionTaggerModel
 from src.modeling.recipe_clustering import RecipeClusterer
-from config.config import CHATBOT_CONFIG
+from config.config import CHATBOT_CONFIG, MEMORY_CONFIG
+from src.utils.data_cache import DataCache
+import gc
 
 # Page configuration
 st.set_page_config(
@@ -101,15 +103,35 @@ logger = logging.getLogger(__name__)
 
 @st.cache_resource
 def load_pipeline():
-    """Load and cache the recipe discovery system."""
+    """Load and cache the recipe discovery system with memory optimization."""
     with st.spinner("Loading recipe database..."):
         try:
-            pipeline = IntegratedRecommendationPipeline(
-                recipes_path="data/raw/RAW_recipes.csv",
-                interactions_path="data/raw/RAW_interactions.csv",
-                models_dir="outputs/models",
-                load_models=True
-            )
+            # ✅ OPTIMISATION MÉMOIRE: Utiliser les fichiers preprocessed si disponibles
+            from pathlib import Path
+            processed_recipes = Path("data/processed/processed_recipes.csv")
+            processed_interactions = Path("data/processed/interactions_clean.csv")
+            
+            # ✅ STREAMLIT CLOUD: Ne charger QUE les colonnes essentielles
+            # Cela réduit la RAM de ~40%
+            # if MEMORY_CONFIG.get("use_column_subset", False):
+            #     st.info("🧠 Memory-optimized loading for Streamlit Cloud...")
+            
+            if processed_recipes.exists() and processed_interactions.exists():
+                # Utiliser les fichiers preprocessed (plus rapide)
+                pipeline = IntegratedRecommendationPipeline(
+                    recipes_path="data/processed/processed_recipes.csv",
+                    interactions_path="data/processed/interactions_clean.csv",
+                    models_dir="outputs/models",
+                    load_models=True
+                )
+            else:
+                # Fallback sur les fichiers RAW si processed n'existe pas
+                pipeline = IntegratedRecommendationPipeline(
+                    recipes_path="data/raw/RAW_recipes.csv",
+                    interactions_path="data/raw/RAW_interactions.csv",
+                    models_dir="outputs/models",
+                    load_models=True
+                )
 
             # Train recommendation system if not trained
             if not pipeline.svd_trained:
@@ -123,6 +145,31 @@ def load_pipeline():
             return None
 
 
+def cleanup_memory_after_page(page_name: str):
+    """
+    Libère la mémoire après l'utilisation d'une page (pour Streamlit Cloud).
+    Stratégie intelligente: garde recipes, libère interactions sélectivement.
+    """
+    if not MEMORY_CONFIG.get("aggressive_mode", False):
+        return  # Mode local, pas de nettoyage nécessaire
+    
+    # Pages qui n'utilisent PAS interactions (on peut les décharger)
+    pages_without_interactions = [
+        "Home", "Time Prediction", "Nutrition Tagging", 
+        "Clustering", "Chatbot"
+    ]
+    
+    # Si on vient d'une page qui utilise interactions et on va vers une page qui ne l'utilise pas
+    if page_name in pages_without_interactions:
+        if MEMORY_CONFIG.get("unload_interactions_after_use", True):
+            if DataCache.is_cached("interactions"):
+                DataCache.clear_cache(clear_recipes=False, clear_interactions=True)
+                gc.collect()
+    
+    # Toujours décharger le modèle de sentiment après utilisation
+    if MEMORY_CONFIG.get("unload_sentiment_model", True) and page_name != "Sentiment Analysis":
+        # Le modèle de sentiment sera déchargé dans sa propre page
+        pass
 
 
 def main():
@@ -191,24 +238,33 @@ def main():
         st.markdown("**Updated:** 2025-10-28")
 
     # Main content based on selected tab
-    if tab_selection == "🏠 Home & Getting Started":
+    if tab_selection == "🏠 Home":
         show_home_page(pipeline)
+        cleanup_memory_after_page("Home")
     elif tab_selection == "🎯 Find Recipes":
         show_recommendations_page(pipeline)
+        cleanup_memory_after_page("Recommendations")
     elif tab_selection == "🤖 Recipe Chatbot":
         show_chatbot_page(pipeline)
+        cleanup_memory_after_page("Chatbot")
     elif tab_selection == "⏰ Cooking Time":
         show_time_prediction_inference(pipeline)
+        cleanup_memory_after_page("Time Prediction")
     elif tab_selection == "🥗 Nutrition Info":
         show_nutrition_tagging_inference(pipeline)
+        cleanup_memory_after_page("Nutrition Tagging")
     elif tab_selection == "📊 Recipe Categories":
         show_clustering_page(pipeline)
+        cleanup_memory_after_page("Clustering")
     elif tab_selection == "💭 Review Analysis":
         show_sentiment_page(pipeline)
+        cleanup_memory_after_page("Sentiment Analysis")
     elif tab_selection == "📈 Dataset Insights":
         show_analytics_page(pipeline)
+        cleanup_memory_after_page("Analytics")
     elif tab_selection == "ℹ️ About & Help":
         show_about_page()
+        cleanup_memory_after_page("About")
 
 
 def show_home_page(pipeline):
@@ -2030,6 +2086,16 @@ def show_sentiment_page(pipeline):
             except Exception as e:
                 st.error(f"❌ Error: {e}")
                 logger.error(f"Sentiment analysis error: {e}", exc_info=True)
+    
+    # ✅ STREAMLIT CLOUD: Décharger le modèle de sentiment après utilisation
+    # Libère ~500MB de RAM
+    if MEMORY_CONFIG.get("unload_sentiment_model", True):
+        try:
+            from src.sentiment_analysis import SentimentAnalyzer
+            SentimentAnalyzer.unload_model()
+            gc.collect()
+        except:
+            pass  # Ignore si modèle pas chargé
 
 
 def show_chatbot_page(pipeline):

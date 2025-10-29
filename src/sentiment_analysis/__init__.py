@@ -41,3 +41,15 @@ class SentimentAnalyzer:
         result = cls._sentiment_analyzer(text)
 
         return result[0]["label"], result[0]["score"]
+    
+    @classmethod
+    def unload_model(cls):
+        """
+        Décharge le modèle de sentiment pour libérer la RAM (~500MB).
+        Utilisé pour Streamlit Cloud avec limite de RAM.
+        """
+        if cls._sentiment_analyzer is not None:
+            del cls._sentiment_analyzer
+            cls._sentiment_analyzer = None
+            import gc
+            gc.collect()

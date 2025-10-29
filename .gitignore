@@ -45,7 +45,7 @@ uv.lock
 
 # Data
 # data/raw/*.csv
-data/processed/*.csv
+# data/processed/*.csv
 data/raw/*.pkl
 data/processed/*.pkl
 !data/raw/.gitkeep

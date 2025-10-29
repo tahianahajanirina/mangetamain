@@ -222,6 +222,16 @@ CHATBOT_CONFIG = {
     "retrieval_top_k": 5,
 }
 
+# Memory management for Streamlit Cloud (1GB RAM limit)
+MEMORY_CONFIG = {
+    "aggressive_mode": True,  # True pour Streamlit Cloud, False pour local
+    "unload_dataframes_after_page": True,  # Décharger DataFrames entre pages
+    "keep_recipes_cached": True,  # Garder recipes (utilisé par 75% des pages)
+    "unload_interactions_after_use": True,  # Décharger interactions (38% des pages)
+    "unload_sentiment_model": True,  # Décharger modèle sentiment après utilisation
+    "use_column_subset": True,  # Charger seulement colonnes nécessaires
+}
+
 # Logging configuration
 LOGGING_CONFIG = {
     "version": 1,

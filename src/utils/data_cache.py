@@ -47,7 +47,8 @@ class DataCache:
         cls, 
         path: Optional[str] = None,
         force_reload: bool = False,
-        optimize_dtypes: bool = True
+        optimize_dtypes: bool = True,
+        columns: Optional[list] = None
     ) -> pd.DataFrame:
         """
         Get recipes DataFrame from cache or load it.
@@ -56,6 +57,7 @@ class DataCache:
             path: Path to recipes CSV file (uses default if None)
             force_reload: Force reload even if cached
             optimize_dtypes: Use optimized data types to reduce memory
+            columns: Specific columns to load (None = all columns) ✅ NOUVEAU
             
         Returns:
             DataFrame with recipes data
@@ -66,14 +68,20 @@ class DataCache:
         if not force_reload and cls._recipes_cache is not None:
             cache_path = cls._cache_metadata.get('recipes_path')
             if cache_path == path:
-                logger.info(f"Using cached recipes data ({len(cls._recipes_cache)} recipes)")
+                logger.info(f"✅ Using cached recipes data ({len(cls._recipes_cache)} recipes)")
+                # Si colonnes spécifiques demandées, retourner seulement ces colonnes
+                if columns:
+                    return cls._recipes_cache[columns]
                 return cls._recipes_cache
         
         # Load from file
         logger.info(f"Loading recipes from {path}...")
         
-        if optimize_dtypes:
-            # Optimized dtypes to reduce memory by ~50%
+        # Déterminer si c'est un fichier preprocessed (structure différente)
+        is_processed = "processed" in str(path).lower()
+        
+        if optimize_dtypes and not is_processed:
+            # ✅ Pour fichiers RAW: Optimized dtypes to reduce memory by ~50%
             dtypes = {
                 'id': 'int32',
                 'minutes': 'int32',
@@ -91,11 +99,30 @@ class DataCache:
             
             cls._recipes_cache = pd.read_csv(
                 path,
+                usecols=columns,
                 dtype=dtypes,
                 low_memory=False
             )
         else:
-            cls._recipes_cache = pd.read_csv(path)
+            # ✅ Pour fichiers PROCESSED ou sans optimisation: laisser pandas inférer les types
+            cls._recipes_cache = pd.read_csv(
+                path, 
+                usecols=columns,
+                low_memory=False
+            )
+            
+            # Si optimize_dtypes est True, optimiser après chargement
+            if optimize_dtypes and is_processed:
+                # Conversion sécurisée des types après chargement
+                for col in cls._recipes_cache.columns:
+                    if col in ['id', 'minutes', 'contributor_id']:
+                        cls._recipes_cache[col] = cls._recipes_cache[col].astype('int32', errors='ignore')
+                    elif col in ['n_steps', 'n_ingredients']:
+                        cls._recipes_cache[col] = cls._recipes_cache[col].astype('int16', errors='ignore')
+                    elif col in ['calories', 'total_fat_pdv', 'sugar_pdv', 'sodium_pdv', 
+                                 'protein_pdv', 'saturated_fat_pdv', 'carbs_pdv', 'total_fat',
+                                 'sugar', 'sodium', 'protein', 'saturated_fat', 'carbohydrates']:
+                        cls._recipes_cache[col] = cls._recipes_cache[col].astype('float32', errors='ignore')
         
         # Store metadata
         cls._cache_metadata['recipes_path'] = path
@@ -114,7 +141,8 @@ class DataCache:
         cls, 
         path: Optional[str] = None,
         force_reload: bool = False,
-        optimize_dtypes: bool = True
+        optimize_dtypes: bool = True,
+        columns: Optional[list] = None
     ) -> pd.DataFrame:
         """
         Get interactions DataFrame from cache or load it.
@@ -123,6 +151,7 @@ class DataCache:
             path: Path to interactions CSV file (uses default if None)
             force_reload: Force reload even if cached
             optimize_dtypes: Use optimized data types to reduce memory
+            columns: Specific columns to load (None = all columns) ✅ NOUVEAU
             
         Returns:
             DataFrame with interactions data
@@ -133,14 +162,20 @@ class DataCache:
         if not force_reload and cls._interactions_cache is not None:
             cache_path = cls._cache_metadata.get('interactions_path')
             if cache_path == path:
-                logger.info(f"Using cached interactions data ({len(cls._interactions_cache)} interactions)")
+                logger.info(f"✅ Using cached interactions data ({len(cls._interactions_cache)} interactions)")
+                # Si colonnes spécifiques demandées, retourner seulement ces colonnes
+                if columns:
+                    return cls._interactions_cache[columns]
                 return cls._interactions_cache
         
         # Load from file
         logger.info(f"Loading interactions from {path}...")
         
-        if optimize_dtypes:
-            # Optimized dtypes to reduce memory
+        # Déterminer si c'est un fichier preprocessed
+        is_processed = "processed" in str(path).lower() or "clean" in str(path).lower()
+        
+        if optimize_dtypes and not is_processed:
+            # ✅ Pour fichiers RAW: Optimized dtypes to reduce memory
             dtypes = {
                 'user_id': 'int32',
                 'recipe_id': 'int32',
@@ -149,11 +184,25 @@ class DataCache:
             
             cls._interactions_cache = pd.read_csv(
                 path,
+                usecols=columns,
                 dtype=dtypes,
                 low_memory=False
             )
         else:
-            cls._interactions_cache = pd.read_csv(path)
+            # ✅ Pour fichiers PROCESSED ou sans optimisation: laisser pandas inférer
+            cls._interactions_cache = pd.read_csv(
+                path,
+                usecols=columns,
+                low_memory=False
+            )
+            
+            # Si optimize_dtypes est True, optimiser après chargement
+            if optimize_dtypes and is_processed:
+                for col in cls._interactions_cache.columns:
+                    if col in ['user_id', 'recipe_id']:
+                        cls._interactions_cache[col] = cls._interactions_cache[col].astype('int32', errors='ignore')
+                    elif col == 'rating':
+                        cls._interactions_cache[col] = cls._interactions_cache[col].astype('int8', errors='ignore')
         
         # Store metadata
         cls._cache_metadata['interactions_path'] = path
