@@ -52,7 +52,7 @@ def main():
             print("=" * 80)
 
             builder = RecipeFeatureBuilder(min_rating=3.5)
-            recipes_features = builder.build_features(
+            _ = builder.build_features(
                 recipes_path=str(recipes_path), interactions_path=str(interactions_path)
             )
             builder.save_features(str(features_path))

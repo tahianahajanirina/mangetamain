@@ -200,7 +200,7 @@ def evaluate_model(classifier: NutritionClassifier) -> dict:
     )
 
     # Feature importance
-    importance_df = classifier.get_feature_importance(top_n=15)
+    _ = classifier.get_feature_importance(top_n=15)
 
     logger.info("✅ Évaluation terminée")
 
