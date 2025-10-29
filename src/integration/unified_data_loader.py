@@ -58,9 +58,16 @@ class UnifiedRecipeDataLoader:
         # Use global cache to get raw data (no redundant CSV reads)
         df_raw = DataCache.get_recipes(path=str(self.recipes_path), optimize_dtypes=True)
 
-        # Basic preprocessing (this creates a copy, but only once)
-        logger.info("Preprocessing recipe data...")
-        df_processed = self._preprocess_basic(df_raw)
+        # ✅ OPTIMISATION: Skip preprocessing if file is already preprocessed
+        is_already_preprocessed = "processed" in str(self.recipes_path).lower()
+        
+        if is_already_preprocessed:
+            logger.info("✅ File is already preprocessed, skipping preprocessing step")
+            df_processed = df_raw
+        else:
+            # Basic preprocessing (this creates a copy, but only once)
+            logger.info("Preprocessing recipe data...")
+            df_processed = self._preprocess_basic(df_raw)
 
         # Cache the preprocessed data locally
         self._recipes_preprocessed = df_processed
