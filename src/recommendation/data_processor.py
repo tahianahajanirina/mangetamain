@@ -3,11 +3,11 @@ Data Processing Module for Recommendation System.
 Handles data loading, validation, encoding, and sparse matrix creation.
 """
 
-import pandas as pd
-import numpy as np
-from scipy.sparse import csr_matrix
 import logging
 from pathlib import Path
+
+import pandas as pd
+from scipy.sparse import csr_matrix
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -17,7 +17,7 @@ class DataProcessor:
     Handles all data processing operations for the recommendation system.
     Responsible for loading, validating, encoding, and preparing data for SVD.
     """
-    
+
     def __init__(self):
         """Initialize the data processor."""
         self.df_interactions = None
@@ -25,7 +25,7 @@ class DataProcessor:
         self.user_cat = None
         self.recipe_cat = None
         self.sparse_matrix = None
-        
+
     def load_csv_data(self, filepath, description="dataset"):
         """
         Load a CSV file with error handling.
@@ -38,7 +38,9 @@ class DataProcessor:
         filepath = Path(filepath)
         try:
             df = pd.read_csv(filepath)
-            logging.info(f"{description} loaded successfully ({filepath}): {df.shape[0]} rows")
+            logging.info(
+                f"{description} loaded successfully ({filepath}): {df.shape[0]} rows"
+            )
             return df
         except FileNotFoundError:
             logging.error(f"File {description} not found: {filepath}")
@@ -46,7 +48,7 @@ class DataProcessor:
         except Exception as e:
             logging.error(f"Error loading {description} ({filepath}): {e}")
             raise
-    
+
     def load_data(self, interactions_path, recipes_path):
         """
         Load interaction and recipe data.
@@ -57,26 +59,28 @@ class DataProcessor:
         logging.info("Loading data...")
         self.df_interactions = self.load_csv_data(interactions_path, "Interactions")
         self.df_recipes = self.load_csv_data(recipes_path, "Recipes")
-        
+
         # Display basic information
         logging.info(f"Unique interactions: {len(self.df_interactions)}")
         logging.info(f"Unique users: {self.df_interactions['user_id'].nunique()}")
         logging.info(f"Unique recipes: {self.df_interactions['recipe_id'].nunique()}")
         logging.info(f"Total available recipes: {len(self.df_recipes)}")
 
-    def create_sparse_matrix(self, user_col='user_id', recipe_col='recipe_id', rating_col='rating'):
+    def create_sparse_matrix(
+        self, user_col="user_id", recipe_col="recipe_id", rating_col="rating"
+    ):
         """
         Create sparse user-recipe matrix from interactions data.
         Args:
             user_col (str): column name for user IDs
-            recipe_col (str): column name for recipe IDs  
+            recipe_col (str): column name for recipe IDs
             rating_col (str): column name for ratings
         """
         if self.df_interactions is None:
             raise ValueError("Interaction data must be loaded first")
-            
+
         logging.info("Creating sparse matrix...")
-        
+
         # Validate required columns exist
         required_cols = [user_col, recipe_col, rating_col]
         for col in required_cols:
@@ -84,8 +88,8 @@ class DataProcessor:
                 raise ValueError(f"Missing column: {col}")
 
         # Encode IDs as categories
-        self.user_cat = self.df_interactions[user_col].astype('category')
-        self.recipe_cat = self.df_interactions[recipe_col].astype('category')
+        self.user_cat = self.df_interactions[user_col].astype("category")
+        self.recipe_cat = self.df_interactions[recipe_col].astype("category")
         user_codes = self.user_cat.cat.codes
         recipe_codes = self.recipe_cat.cat.codes
 
@@ -95,10 +99,13 @@ class DataProcessor:
         # Build sparse matrix
         n_users = self.user_cat.cat.categories.size
         n_recipes = self.recipe_cat.cat.categories.size
-        self.sparse_matrix = csr_matrix((ratings, (user_codes, recipe_codes)),
-                                       shape=(n_users, n_recipes))
+        self.sparse_matrix = csr_matrix(
+            (ratings, (user_codes, recipe_codes)), shape=(n_users, n_recipes)
+        )
 
-        logging.info(f"Sparse matrix created: {n_users} users, {n_recipes} recipes, {self.sparse_matrix.nnz} ratings.")
+        logging.info(
+            f"Sparse matrix created: {n_users} users, {n_recipes} recipes, {self.sparse_matrix.nnz} ratings."
+        )
 
     def get_user_index(self, user_real_id):
         """
@@ -111,15 +118,15 @@ class DataProcessor:
         """
         if self.user_cat is None:
             raise ValueError("User categories must be created first")
-            
+
         user_id_list = self.user_cat.cat.categories.tolist()
-        
+
         # Convert to same type for comparison
         if isinstance(user_real_id, str):
             user_id_list = [str(uid) for uid in user_id_list]
         elif isinstance(user_real_id, int):
             user_id_list = [int(uid) for uid in user_id_list]
-        
+
         try:
             user_idx = user_id_list.index(user_real_id)
             logging.info(f"User found: ID {user_real_id}, index {user_idx}")
@@ -137,10 +144,12 @@ class DataProcessor:
         """
         if self.user_cat is None:
             raise ValueError("User categories must be created first")
-            
+
         user_id_list = self.user_cat.cat.categories.tolist()
         if not (0 <= user_idx < len(user_id_list)):
-            logging.error(f"User index {user_idx} out of bounds (0 to {len(user_id_list)-1})")
+            logging.error(
+                f"User index {user_idx} out of bounds (0 to {len(user_id_list)-1})"
+            )
             raise IndexError("User index out of bounds")
         selected_user_id = user_id_list[user_idx]
         logging.info(f"User selected: idx {user_idx}, id {selected_user_id}")
@@ -155,17 +164,24 @@ class DataProcessor:
         Returns:
             pd.DataFrame: DataFrame with recipes sorted by rating
         """
-        user_ratings = self.df_interactions[self.df_interactions['user_id'] == user_id]
+        user_ratings = self.df_interactions[self.df_interactions["user_id"] == user_id]
         if user_ratings.empty:
             logging.warning(f"No historical data found for user {user_id}")
-            return pd.DataFrame(columns=['id', 'name', 'rating'])
-        
+            return pd.DataFrame(columns=["id", "name", "rating"])
+
         # Sort by rating descending and get top N
-        top_ratings = user_ratings.nlargest(top_n, 'rating')
-        result = self.df_recipes[self.df_recipes['id'].isin(top_ratings['recipe_id'])][['id', 'name']]
-        result = result.merge(top_ratings[['recipe_id', 'rating']], left_on='id', right_on='recipe_id', how='left')
-        result = result.drop('recipe_id', axis=1).sort_values('rating', ascending=False)
-        
+        top_ratings = user_ratings.nlargest(top_n, "rating")
+        result = self.df_recipes[self.df_recipes["id"].isin(top_ratings["recipe_id"])][
+            ["id", "name"]
+        ]
+        result = result.merge(
+            top_ratings[["recipe_id", "rating"]],
+            left_on="id",
+            right_on="recipe_id",
+            how="left",
+        )
+        result = result.drop("recipe_id", axis=1).sort_values("rating", ascending=False)
+
         # Remove detailed logging to avoid duplicates in output
         return result.reset_index(drop=True)
 
@@ -179,27 +195,37 @@ class DataProcessor:
             pd.DataFrame: DataFrame with popular recipes
         """
         # Calculate recipe statistics
-        recipe_stats = self.df_interactions.groupby('recipe_id').agg({
-            'rating': ['mean', 'count']
-        }).reset_index()
-        
+        recipe_stats = (
+            self.df_interactions.groupby("recipe_id")
+            .agg({"rating": ["mean", "count"]})
+            .reset_index()
+        )
+
         # Flatten column names
-        recipe_stats.columns = ['recipe_id', 'avg_rating', 'rating_count']
-        
+        recipe_stats.columns = ["recipe_id", "avg_rating", "rating_count"]
+
         # Filter by minimum ratings and sort by average rating
-        popular_recipes = recipe_stats[recipe_stats['rating_count'] >= min_ratings]
-        popular_recipes = popular_recipes.sort_values(['avg_rating', 'rating_count'], ascending=[False, False])
-        
+        popular_recipes = recipe_stats[recipe_stats["rating_count"] >= min_ratings]
+        popular_recipes = popular_recipes.sort_values(
+            ["avg_rating", "rating_count"], ascending=[False, False]
+        )
+
         # Get top N
         top_popular = popular_recipes.head(top_n)
-        
+
         # Merge with recipe names
-        result = self.df_recipes[self.df_recipes['id'].isin(top_popular['recipe_id'])][['id', 'name']]
-        result = result.merge(top_popular[['recipe_id', 'avg_rating', 'rating_count']], 
-                            left_on='id', right_on='recipe_id', how='left')
-        result = result.drop('recipe_id', axis=1)
-        result = result.sort_values('avg_rating', ascending=False)
-        
+        result = self.df_recipes[self.df_recipes["id"].isin(top_popular["recipe_id"])][
+            ["id", "name"]
+        ]
+        result = result.merge(
+            top_popular[["recipe_id", "avg_rating", "rating_count"]],
+            left_on="id",
+            right_on="recipe_id",
+            how="left",
+        )
+        result = result.drop("recipe_id", axis=1)
+        result = result.sort_values("avg_rating", ascending=False)
+
         # Remove detailed logging to avoid duplicates in output
         return result.reset_index(drop=True)
 
@@ -211,7 +237,7 @@ class DataProcessor:
         Returns:
             int: number of interactions
         """
-        user_ratings = self.df_interactions[self.df_interactions['user_id'] == user_id]
+        user_ratings = self.df_interactions[self.df_interactions["user_id"] == user_id]
         return len(user_ratings)
 
     def get_recipe_names(self, recipe_ids):
@@ -222,7 +248,7 @@ class DataProcessor:
         Returns:
             pd.DataFrame: DataFrame with recipe IDs and names
         """
-        return self.df_recipes[self.df_recipes['id'].isin(recipe_ids)][['id', 'name']]
+        return self.df_recipes[self.df_recipes["id"].isin(recipe_ids)][["id", "name"]]
 
     def get_user_rated_recipes(self, user_id):
         """
@@ -232,8 +258,8 @@ class DataProcessor:
         Returns:
             set: set of recipe IDs
         """
-        user_ratings = self.df_interactions[self.df_interactions['user_id'] == user_id]
-        return set(user_ratings['recipe_id'])
+        user_ratings = self.df_interactions[self.df_interactions["user_id"] == user_id]
+        return set(user_ratings["recipe_id"])
 
     def get_recipe_ids_list(self):
         """
@@ -251,6 +277,8 @@ class DataProcessor:
         Returns:
             bool: True if ready, False otherwise
         """
-        return (self.df_interactions is not None and 
-                self.df_recipes is not None and 
-                self.sparse_matrix is not None)
+        return (
+            self.df_interactions is not None
+            and self.df_recipes is not None
+            and self.sparse_matrix is not None
+        )

@@ -1,4 +1,4 @@
-name: Full ML + Docker Pipeline
+name: Full Pipeline
 
 on:
   push:
@@ -41,8 +41,8 @@ jobs:
     
     - name: Run linting
       run: |
-        ruff check .
-        black --check .
+        ruff check src/ scripts/ config/ --output-format=github
+        black --check src/ scripts/ config/ tests/
 
   # Job 2: ML Training
   ml-training:

@@ -7,11 +7,11 @@ basic cleaning.
 
 import ast
 import logging
+from pathlib import Path
 from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd
-from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,9 @@ class RecipeDataLoader:
 
         logger.info(f"Loading data from {self.data_path}")
         self.df = pd.read_csv(self.data_path)
-        logger.info(f"Loaded {len(self.df)} recipes with {len(self.df.columns)} columns")
+        logger.info(
+            f"Loaded {len(self.df)} recipes with {len(self.df.columns)} columns"
+        )
 
         return self.df
 
@@ -90,10 +92,10 @@ class RecipeDataLoader:
         logger.info("Converting data types")
 
         # Convert submitted to datetime
-        self.df['submitted'] = pd.to_datetime(self.df['submitted'])
+        self.df["submitted"] = pd.to_datetime(self.df["submitted"])
 
         # Parse JSON/list formats
-        list_columns = ['tags', 'steps', 'ingredients', 'nutrition']
+        list_columns = ["tags", "steps", "ingredients", "nutrition"]
         for col in list_columns:
             self.df[col] = self.df[col].apply(self.safe_eval)
 
@@ -116,12 +118,17 @@ class RecipeDataLoader:
         logger.info("Expanding nutrition column")
 
         nutrition_cols = [
-            'calories', 'total_fat_pdv', 'sugar_pdv', 'sodium_pdv',
-            'protein_pdv', 'saturated_fat_pdv', 'carbs_pdv'
+            "calories",
+            "total_fat_pdv",
+            "sugar_pdv",
+            "sodium_pdv",
+            "protein_pdv",
+            "saturated_fat_pdv",
+            "carbs_pdv",
         ]
 
         for i, col in enumerate(nutrition_cols):
-            self.df[col] = self.df['nutrition'].apply(
+            self.df[col] = self.df["nutrition"].apply(
                 lambda x: x[i] if len(x) > i else np.nan
             )
 
@@ -145,13 +152,18 @@ class RecipeDataLoader:
         logger.info("Handling missing values")
 
         # Fill text columns
-        self.df['description'] = self.df['description'].fillna('')
-        self.df['name'] = self.df['name'].fillna('')
+        self.df["description"] = self.df["description"].fillna("")
+        self.df["name"] = self.df["name"].fillna("")
 
         # Impute nutrition columns with median
         nutrition_cols = [
-            'calories', 'total_fat_pdv', 'sugar_pdv', 'sodium_pdv',
-            'protein_pdv', 'saturated_fat_pdv', 'carbs_pdv'
+            "calories",
+            "total_fat_pdv",
+            "sugar_pdv",
+            "sodium_pdv",
+            "protein_pdv",
+            "saturated_fat_pdv",
+            "carbs_pdv",
         ]
 
         for col in nutrition_cols:
@@ -178,12 +190,12 @@ class RecipeDataLoader:
         logger.info("Handling outliers")
 
         # Cap extreme values in minutes
-        cap_value = self.df['minutes'].quantile(0.99)
-        self.df['minutes_original'] = self.df['minutes']
-        self.df['minutes'] = self.df['minutes'].clip(upper=cap_value)
+        cap_value = self.df["minutes"].quantile(0.99)
+        self.df["minutes_original"] = self.df["minutes"]
+        self.df["minutes"] = self.df["minutes"].clip(upper=cap_value)
 
         # Flag unrealistic times (> 1 week)
-        self.df['unrealistic_time'] = (self.df['minutes_original'] > 10080).astype(int)
+        self.df["unrealistic_time"] = (self.df["minutes_original"] > 10080).astype(int)
 
         logger.info(f"Capped minutes at {cap_value:.0f}")
         logger.info(f"Flagged {self.df['unrealistic_time'].sum()} unrealistic times")
@@ -224,8 +236,8 @@ class RecipeDataLoader:
             raise ValueError("Data not loaded. Call load_data() first.")
 
         return {
-            'n_recipes': len(self.df),
-            'n_columns': len(self.df.columns),
-            'missing_values': self.df.isnull().sum().to_dict(),
-            'dtypes': self.df.dtypes.to_dict()
+            "n_recipes": len(self.df),
+            "n_columns": len(self.df.columns),
+            "missing_values": self.df.isnull().sum().to_dict(),
+            "dtypes": self.df.dtypes.to_dict(),
         }

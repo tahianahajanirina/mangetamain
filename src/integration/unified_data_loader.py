@@ -6,9 +6,10 @@ Handles data loading and preprocessing for all models in the integrated pipeline
 import ast
 import logging
 from pathlib import Path
-from typing import List, Optional, Dict
-import pandas as pd
+from typing import List
+
 import numpy as np
+import pandas as pd
 
 from config.config import FEATURE_CONFIG
 
@@ -76,7 +77,7 @@ class UnifiedRecipeDataLoader:
         all_recipes = self.load_all_recipes(use_cache=True)
 
         # Filter by IDs
-        recipes = all_recipes[all_recipes['id'].isin(recipe_ids)].copy()
+        recipes = all_recipes[all_recipes["id"].isin(recipe_ids)].copy()
 
         logger.info(f"Loaded {len(recipes)} recipes out of {len(recipe_ids)} requested")
         return recipes
@@ -94,7 +95,7 @@ class UnifiedRecipeDataLoader:
         df = df.copy()
 
         # Convert string columns to lists
-        list_columns = ['ingredients', 'steps', 'tags', 'nutrition']
+        list_columns = ["ingredients", "steps", "tags", "nutrition"]
 
         for col in list_columns:
             if col in df.columns:
@@ -104,15 +105,19 @@ class UnifiedRecipeDataLoader:
                     logger.warning(f"Error converting {col} to list: {e}")
 
         # Extract nutrition values if nutrition column exists
-        if 'nutrition' in df.columns:
+        if "nutrition" in df.columns:
             df = self._extract_nutrition(df)
 
         # Add n_ingredients and n_steps if not present
-        if 'n_ingredients' not in df.columns and 'ingredients' in df.columns:
-            df['n_ingredients'] = df['ingredients'].apply(lambda x: len(x) if isinstance(x, list) else 0)
+        if "n_ingredients" not in df.columns and "ingredients" in df.columns:
+            df["n_ingredients"] = df["ingredients"].apply(
+                lambda x: len(x) if isinstance(x, list) else 0
+            )
 
-        if 'n_steps' not in df.columns and 'steps' in df.columns:
-            df['n_steps'] = df['steps'].apply(lambda x: len(x) if isinstance(x, list) else 0)
+        if "n_steps" not in df.columns and "steps" in df.columns:
+            df["n_steps"] = df["steps"].apply(
+                lambda x: len(x) if isinstance(x, list) else 0
+            )
 
         # Fill missing values
         df = self._fill_missing_values(df)
@@ -147,23 +152,28 @@ class UnifiedRecipeDataLoader:
         """
         df = df.copy()
 
-        nutrition_cols = ['calories', 'total_fat_pdv', 'sugar_pdv', 'sodium_pdv',
-                         'protein_pdv', 'saturated_fat_pdv', 'carbs_pdv']
+        nutrition_cols = [
+            "calories",
+            "total_fat_pdv",
+            "sugar_pdv",
+            "sodium_pdv",
+            "protein_pdv",
+            "saturated_fat_pdv",
+            "carbs_pdv",
+        ]
 
         # Check if nutrition values are already extracted
         if all(col in df.columns for col in nutrition_cols):
             return df
 
-        if 'nutrition' not in df.columns:
+        if "nutrition" not in df.columns:
             logger.warning("No nutrition column found")
             return df
 
         try:
             # Extract nutrition values
             nutrition_df = pd.DataFrame(
-                df['nutrition'].tolist(),
-                columns=nutrition_cols,
-                index=df.index
+                df["nutrition"].tolist(), columns=nutrition_cols, index=df.index
             )
 
             # Add to main dataframe
@@ -194,8 +204,15 @@ class UnifiedRecipeDataLoader:
         df = df.copy()
 
         # Fill numeric nutrition columns with median
-        nutrition_cols = ['calories', 'total_fat_pdv', 'sugar_pdv', 'sodium_pdv',
-                         'protein_pdv', 'saturated_fat_pdv', 'carbs_pdv']
+        nutrition_cols = [
+            "calories",
+            "total_fat_pdv",
+            "sugar_pdv",
+            "sodium_pdv",
+            "protein_pdv",
+            "saturated_fat_pdv",
+            "carbs_pdv",
+        ]
 
         for col in nutrition_cols:
             if col in df.columns:
@@ -203,26 +220,26 @@ class UnifiedRecipeDataLoader:
                 df[col].fillna(median_val, inplace=True)
 
         # Fill list columns with empty lists
-        list_columns = ['ingredients', 'steps', 'tags']
+        list_columns = ["ingredients", "steps", "tags"]
         for col in list_columns:
             if col in df.columns:
                 df[col] = df[col].apply(lambda x: x if isinstance(x, list) else [])
 
         # Fill text columns with empty strings
-        text_columns = ['name', 'description']
+        text_columns = ["name", "description"]
         for col in text_columns:
             if col in df.columns:
-                df[col].fillna('', inplace=True)
+                df[col].fillna("", inplace=True)
 
         # Fill numeric columns
-        if 'minutes' in df.columns:
-            df['minutes'].fillna(df['minutes'].median(), inplace=True)
+        if "minutes" in df.columns:
+            df["minutes"].fillna(df["minutes"].median(), inplace=True)
 
-        if 'n_steps' in df.columns:
-            df['n_steps'].fillna(0, inplace=True)
+        if "n_steps" in df.columns:
+            df["n_steps"].fillna(0, inplace=True)
 
-        if 'n_ingredients' in df.columns:
-            df['n_ingredients'].fillna(0, inplace=True)
+        if "n_ingredients" in df.columns:
+            df["n_ingredients"].fillna(0, inplace=True)
 
         return df
 
@@ -244,8 +261,8 @@ class UnifiedRecipeDataLoader:
 
         # Initialize time feature engineer
         time_fe = TimeFeatureEngineer(
-            cooking_verbs=FEATURE_CONFIG['cooking_verbs'],
-            equipment_terms=FEATURE_CONFIG['equipment_terms']
+            cooking_verbs=FEATURE_CONFIG["cooking_verbs"],
+            equipment_terms=FEATURE_CONFIG["equipment_terms"],
         )
 
         # Engineer features
@@ -272,9 +289,9 @@ class UnifiedRecipeDataLoader:
 
         # Initialize nutrition feature engineer
         nutrition_fe = NutritionFeatureEngineer(
-            ingredient_categories=FEATURE_CONFIG['ingredient_categories'],
-            dietary_patterns=FEATURE_CONFIG['dietary_patterns'],
-            nutrition_cols=FEATURE_CONFIG['nutrition_cols']
+            ingredient_categories=FEATURE_CONFIG["ingredient_categories"],
+            dietary_patterns=FEATURE_CONFIG["dietary_patterns"],
+            nutrition_cols=FEATURE_CONFIG["nutrition_cols"],
         )
 
         # Engineer features
@@ -293,8 +310,15 @@ class UnifiedRecipeDataLoader:
         Returns:
             DataFrame with display columns
         """
-        display_cols = ['id', 'name', 'minutes', 'n_steps', 'n_ingredients',
-                       'description', 'calories']
+        display_cols = [
+            "id",
+            "name",
+            "minutes",
+            "n_steps",
+            "n_ingredients",
+            "description",
+            "calories",
+        ]
 
         # Select available columns
         available_cols = [col for col in display_cols if col in df.columns]
@@ -302,9 +326,9 @@ class UnifiedRecipeDataLoader:
         result = df[available_cols].copy()
 
         # Format description (truncate if too long)
-        if 'description' in result.columns:
-            result['description'] = result['description'].apply(
-                lambda x: x[:150] + '...' if len(x) > 150 else x
+        if "description" in result.columns:
+            result["description"] = result["description"].apply(
+                lambda x: x[:150] + "..." if len(x) > 150 else x
             )
 
         return result
@@ -319,20 +343,24 @@ class UnifiedRecipeDataLoader:
         Returns:
             List of feature names
         """
-        if model_type == 'time_prediction':
+        if model_type == "time_prediction":
             from src.feature_engineering.time_features import TimeFeatureEngineer
+
             time_fe = TimeFeatureEngineer(
                 cooking_verbs=set(),  # Empty sets for feature name retrieval
-                equipment_terms=set()
+                equipment_terms=set(),
             )
             return time_fe.get_feature_names()
 
-        elif model_type == 'nutrition_tagging':
-            from src.feature_engineering.nutrition_features import NutritionFeatureEngineer
+        elif model_type == "nutrition_tagging":
+            from src.feature_engineering.nutrition_features import (
+                NutritionFeatureEngineer,
+            )
+
             nutrition_fe = NutritionFeatureEngineer(
                 ingredient_categories={},
                 dietary_patterns={},
-                nutrition_cols=FEATURE_CONFIG['nutrition_cols']
+                nutrition_cols=FEATURE_CONFIG["nutrition_cols"],
             )
             return nutrition_fe.get_feature_names(include_pca=False)
 

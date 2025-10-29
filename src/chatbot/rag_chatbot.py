@@ -5,11 +5,12 @@ This module provides a straightforward RAG (Retrieval Augmented Generation) chat
 that can answer questions about recipes using Google's Gemini model.
 """
 
-import pandas as pd
-import numpy as np
-from typing import List, Dict, Optional
 import logging
+from typing import Dict, List, Optional
+
 import google.generativeai as genai
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,7 @@ class RecipeRAGChatbot:
 
         # Configure Gemini
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        self.model = genai.GenerativeModel("gemini-2.0-flash-exp")
 
         # Prepare recipe context
         self._prepare_recipe_context()
@@ -53,15 +54,15 @@ Steps: {row['n_steps']}
 Ingredients: {row['n_ingredients']}
 """
             # Add nutrition if available
-            if 'calories' in row and pd.notna(row['calories']):
+            if "calories" in row and pd.notna(row["calories"]):
                 recipe_text += f"Calories: {row['calories']:.0f}\n"
 
             # Add tags if available
-            if 'tags' in row and isinstance(row['tags'], list):
+            if "tags" in row and isinstance(row["tags"], list):
                 recipe_text += f"Tags: {', '.join(row['tags'][:5])}\n"
 
             self.recipe_texts.append(recipe_text)
-            self.recipe_ids.append(row['id'])
+            self.recipe_ids.append(row["id"])
 
     def _search_relevant_recipes(self, query: str, top_k: int = 5) -> List[str]:
         """
@@ -120,10 +121,12 @@ Please provide a helpful, accurate, and concise answer based on the recipes prov
 
             # Add chat history if available
             if chat_history:
-                history_text = "\n".join([
-                    f"User: {msg['user']}\nAssistant: {msg['assistant']}"
-                    for msg in chat_history[-3:]  # Last 3 exchanges
-                ])
+                history_text = "\n".join(
+                    [
+                        f"User: {msg['user']}\nAssistant: {msg['assistant']}"
+                        for msg in chat_history[-3:]  # Last 3 exchanges
+                    ]
+                )
                 prompt = f"Previous conversation:\n{history_text}\n\n{prompt}"
 
             # Generate response
@@ -133,20 +136,22 @@ Please provide a helpful, accurate, and concise answer based on the recipes prov
 
         except Exception as e:
             logger.error(f"Error generating response: {e}", exc_info=True)
-            return f"I apologize, but I encountered an error: {str(e)}. Please try again."
+            return (
+                f"I apologize, but I encountered an error: {str(e)}. Please try again."
+            )
 
     def get_recipe_stats(self) -> Dict[str, any]:
         """Get statistics about the recipe dataset"""
         stats = {
-            'total_recipes': len(self.recipes_df),
-            'avg_time': self.recipes_df['minutes'].mean(),
-            'median_time': self.recipes_df['minutes'].median(),
-            'avg_steps': self.recipes_df['n_steps'].mean(),
-            'avg_ingredients': self.recipes_df['n_ingredients'].mean()
+            "total_recipes": len(self.recipes_df),
+            "avg_time": self.recipes_df["minutes"].mean(),
+            "median_time": self.recipes_df["minutes"].median(),
+            "avg_steps": self.recipes_df["n_steps"].mean(),
+            "avg_ingredients": self.recipes_df["n_ingredients"].mean(),
         }
 
-        if 'calories' in self.recipes_df.columns:
-            stats['avg_calories'] = self.recipes_df['calories'].mean()
+        if "calories" in self.recipes_df.columns:
+            stats["avg_calories"] = self.recipes_df["calories"].mean()
 
         return stats
 
@@ -167,9 +172,10 @@ def create_chatbot(api_key: str, recipes_path: str) -> RecipeRAGChatbot:
     recipes_df = pd.read_csv(recipes_path)
 
     # Parse tags if they exist
-    if 'tags' in recipes_df.columns:
+    if "tags" in recipes_df.columns:
         import ast
-        recipes_df['tags'] = recipes_df['tags'].apply(
+
+        recipes_df["tags"] = recipes_df["tags"].apply(
             lambda x: ast.literal_eval(x) if pd.notna(x) and isinstance(x, str) else []
         )
 
