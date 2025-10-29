@@ -47,52 +47,43 @@ def clean_recipes(recipes_raw_path: Path, output_path: Path) -> pd.DataFrame:
     # 2. Doublons
     print("\n[2/7] Suppression des doublons...")
     recipes_before = len(recipes)
-    recipes = recipes.drop_duplicates(subset=["id"])
+    recipes = recipes.drop_duplicates(subset=['id'])
     print(f"  Doublons supprimés: {recipes_before - len(recipes):,}")
 
     # 3. Valeurs manquantes
     print("\n[3/7] Gestion des valeurs manquantes...")
     # Supprimer lignes avec valeurs critiques manquantes
-    critical_cols = ["name", "minutes", "n_steps", "n_ingredients"]
+    critical_cols = ['name', 'minutes', 'n_steps', 'n_ingredients']
     recipes = recipes.dropna(subset=critical_cols)
     print(f"  Recettes après nettoyage: {len(recipes):,}")
 
     # 4. Outliers
     print("\n[4/7] Gestion des outliers...")
     # Temps: garder entre 1 min et 24h (1440 min)
-    recipes = recipes[(recipes["minutes"] >= 1) & (recipes["minutes"] <= 1440)]
+    recipes = recipes[(recipes['minutes'] >= 1) & (recipes['minutes'] <= 1440)]
     # Calories: garder entre 0 et 5000
-    if "calories" in recipes.columns:
-        recipes = recipes[(recipes["calories"] >= 0) & (recipes["calories"] <= 5000)]
+    if 'calories' in recipes.columns:
+        recipes = recipes[(recipes['calories'] >= 0) & (recipes['calories'] <= 5000)]
     print(f"  Recettes après outliers: {len(recipes):,}")
 
     # 5. Parser colonnes JSON
     print("\n[5/7] Parsing des colonnes JSON...")
-    for col in ["tags", "steps", "ingredients"]:
+    for col in ['tags', 'steps', 'ingredients']:
         if col in recipes.columns:
-            recipes[f"{col}_parsed"] = recipes[col].apply(safe_eval)
-            recipes[f"n_{col}"] = recipes[f"{col}_parsed"].apply(len)
+            recipes[f'{col}_parsed'] = recipes[col].apply(safe_eval)
+            recipes[f'n_{col}'] = recipes[f'{col}_parsed'].apply(len)
 
     # 6. Extraire nutrition
     print("\n[6/7] Extraction des valeurs nutritionnelles...")
-    if "nutrition" in recipes.columns:
-        nutrition_data = recipes["nutrition"].apply(safe_eval)
+    if 'nutrition' in recipes.columns:
+        nutrition_data = recipes['nutrition'].apply(safe_eval)
 
         # Colonnes nutrition: [calories, total_fat, sugar, sodium, protein, saturated_fat, carbohydrates]
-        nutrition_cols = [
-            "calories",
-            "total_fat",
-            "sugar",
-            "sodium",
-            "protein",
-            "saturated_fat",
-            "carbohydrates",
-        ]
+        nutrition_cols = ['calories', 'total_fat', 'sugar', 'sodium',
+                         'protein', 'saturated_fat', 'carbohydrates']
 
         for i, col in enumerate(nutrition_cols):
-            recipes[col] = nutrition_data.apply(
-                lambda x: x[i] if len(x) > i else np.nan
-            )
+            recipes[col] = nutrition_data.apply(lambda x: x[i] if len(x) > i else np.nan)
 
     # 7. Export
     print("\n[7/7] Export des données nettoyées...")
@@ -130,21 +121,19 @@ def clean_interactions(interactions_raw_path: Path, output_path: Path) -> pd.Dat
     # 2. Doublons
     print("\n[2/4] Suppression des doublons...")
     interactions_before = len(interactions)
-    interactions = interactions.drop_duplicates(subset=["user_id", "recipe_id", "date"])
+    interactions = interactions.drop_duplicates(subset=['user_id', 'recipe_id', 'date'])
     print(f"  Doublons supprimés: {interactions_before - len(interactions):,}")
 
     # 3. Valider ratings
     print("\n[3/4] Validation des ratings...")
-    if "rating" in interactions.columns:
+    if 'rating' in interactions.columns:
         # Garder seulement ratings entre 0 et 5
-        interactions = interactions[
-            (interactions["rating"] >= 0) & (interactions["rating"] <= 5)
-        ]
+        interactions = interactions[(interactions['rating'] >= 0) & (interactions['rating'] <= 5)]
         print(f"  Ratings valides: {len(interactions):,}")
 
     # 4. Valeurs manquantes
     print("\n[4/4] Suppression valeurs manquantes...")
-    interactions = interactions.dropna(subset=["user_id", "recipe_id", "rating"])
+    interactions = interactions.dropna(subset=['user_id', 'recipe_id', 'rating'])
     print(f"  Interactions finales: {len(interactions):,}")
 
     # Export
@@ -164,11 +153,11 @@ def main():
     print("=" * 80)
 
     # Chemins
-    recipes_raw_path = DATA_RAW / "RAW_recipes.csv"
-    interactions_raw_path = DATA_RAW / "RAW_interactions.csv"
+    recipes_raw_path = DATA_RAW / 'RAW_recipes.csv'
+    interactions_raw_path = DATA_RAW / 'RAW_interactions.csv'
 
-    recipes_clean_path = DATA_PROCESSED / "recipes_clean.csv"
-    interactions_clean_path = DATA_PROCESSED / "interactions_clean.csv"
+    recipes_clean_path = DATA_PROCESSED / 'recipes_clean.csv'
+    interactions_clean_path = DATA_PROCESSED / 'interactions_clean.csv'
 
     # Vérifier que les fichiers bruts existent
     if not recipes_raw_path.exists():
@@ -186,9 +175,7 @@ def main():
         recipes_clean = clean_recipes(recipes_raw_path, recipes_clean_path)
 
         # Nettoyer interactions
-        interactions_clean = clean_interactions(
-            interactions_raw_path, interactions_clean_path
-        )
+        interactions_clean = clean_interactions(interactions_raw_path, interactions_clean_path)
 
         # Résumé final
         print("\n" + "=" * 80)
@@ -213,10 +200,9 @@ def main():
         print("\n❌ ERREUR lors du nettoyage:")
         print(f"   {e}")
         import traceback
-
         traceback.print_exc()
         sys.exit(1)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
