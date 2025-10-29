@@ -1857,21 +1857,6 @@ def show_sentiment_page(pipeline):
 
     st.markdown('<p class="sub-header">💭 Recipe Review Analysis</p>', unsafe_allow_html=True)
 
-    # Check if sentiment analysis is enabled
-    from config.config import SENTIMENT_CONFIG
-    
-    if not SENTIMENT_CONFIG.get("enabled", True):
-        st.warning("⚠️ Sentiment Analysis is currently disabled to save memory.")
-        st.info("""
-        To enable sentiment analysis:
-        1. Open `config/config.py`
-        2. Set `SENTIMENT_CONFIG["enabled"] = True`
-        3. Restart the Streamlit app
-        
-        **Note**: Enabling sentiment analysis will increase memory usage by ~500MB.
-        """)
-        return
-
     # How to use
     with st.expander("📖 How to Use This Feature", expanded=False):
         st.markdown("""
@@ -1915,17 +1900,11 @@ def show_sentiment_page(pipeline):
         help="Write a review and the model will predict its sentiment"
     )
 
-    @st.cache_resource(show_spinner="🔄 Loading sentiment analysis model...")
-    def get_sentiment_analyzer():
-        """Lazy load sentiment analyzer only when needed."""
-        from src.sentiment_analysis import SentimentAnalyzer
-        return SentimentAnalyzer
-
     if st.button("🔮 Predict Sentiment", type="primary", use_container_width=True):
         if user_review and len(user_review.strip()) > 0:
             with st.spinner("🔄 Analyzing your review..."):
                 try:
-                    SentimentAnalyzer = get_sentiment_analyzer()
+                    from src.sentiment_analysis import SentimentAnalyzer
 
                     # Get prediction
                     label, confidence = SentimentAnalyzer.predict_sentiment(user_review)

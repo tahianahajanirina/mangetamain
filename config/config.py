@@ -222,14 +222,6 @@ CHATBOT_CONFIG = {
     "retrieval_top_k": 5,
 }
 
-# Sentiment Analysis configuration
-SENTIMENT_CONFIG = {
-    "enabled": True,  # Set to False to disable sentiment analysis and save RAM
-    "model_name": "TahianaAndriambahoaka/sentiment-analysis-food-reviews",
-    "max_text_length": 512,  # Truncate text to this length to save RAM
-    "lazy_load": True,  # Only load model when first needed
-}
-
 # Logging configuration
 LOGGING_CONFIG = {
     "version": 1,
