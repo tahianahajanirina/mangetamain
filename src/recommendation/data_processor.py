@@ -31,9 +31,9 @@ class DataProcessor:
     def load_csv_data(self, filepath, description="dataset"):
         """
         Load a CSV file with error handling.
-        
+
         NOTE: This method is deprecated. Use load_data() which uses DataCache instead.
-        
+
         Args:
             filepath (str or Path): path to the CSV file
             description (str): descriptive name for logs/errors
@@ -64,8 +64,12 @@ class DataProcessor:
         """
         logging.info("Loading data...")
         # Use global cache to avoid redundant loading
-        self.df_interactions = DataCache.get_interactions(path=str(interactions_path), optimize_dtypes=True)
-        self.df_recipes = DataCache.get_recipes(path=str(recipes_path), optimize_dtypes=True)
+        self.df_interactions = DataCache.get_interactions(
+            path=str(interactions_path), optimize_dtypes=True
+        )
+        self.df_recipes = DataCache.get_recipes(
+            path=str(recipes_path), optimize_dtypes=True
+        )
 
         # Display basic information
         logging.info(f"Unique interactions: {len(self.df_interactions)}")
