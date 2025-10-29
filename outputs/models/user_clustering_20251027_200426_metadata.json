@@ -1,18 +1,3 @@
-{
-  "model_name": "user_clustering_20251027_200426",
-  "timestamp": "20251027_200426",
-  "n_clusters": 2,
-  "pca_variance": 0.95,
-  "random_state": 42,
-  "pca_n_components": 8,
-  "pca_explained_variance": 0.9733194613846845,
-  "cluster_names": {
-    "0": "Actifs & Patients",
-    "1": "Actifs & Patients"
-  },
-  "metrics": {
-    "silhouette": 0.20541028414006743,
-    "inertia": 194623.43396367098,
-    "n_users": 23086
-  }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:308cd121949bad99005f6dbd85425c8f21862af82a3d1cac6a7d3ac1977dee27
+size 442
