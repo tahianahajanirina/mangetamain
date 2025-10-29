@@ -26,7 +26,8 @@ COPY --chown=app:app pyproject.toml README.md ./
 
 # Installer dépendances Python
 RUN pip install --user --no-cache-dir --upgrade pip setuptools wheel
-RUN pip install --user --no-cache-dir .[sentiment]
+RUN pip install --user --no-cache-dir .  # Base dependencies (includes google-generativeai)
+RUN pip install --user --no-cache-dir .[sentiment]  # Sentiment extras (transformers, torch)
 RUN pip install --user --no-cache-dir huggingface_hub
 
 # Copier le code source
