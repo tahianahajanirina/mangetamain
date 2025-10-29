@@ -2,4 +2,4 @@
 
 from .data_loader import RecipeDataLoader
 
-__all__ = ['RecipeDataLoader']
+__all__ = ["RecipeDataLoader"]

@@ -59,6 +59,14 @@ target-version = ['py39', 'py310', 'py311']
 
 [tool.ruff]
 line-length = 88
+exclude = [
+    "notebooks/",
+    ".git",
+    "__pycache__",
+    "*.egg-info",
+]
+
+[tool.ruff.lint]
 select = ["E", "F", "W", "I"]
 ignore = ["E501"]
 

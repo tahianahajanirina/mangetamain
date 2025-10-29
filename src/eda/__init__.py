@@ -2,4 +2,4 @@
 
 from .visualization import RecipeEDA
 
-__all__ = ['RecipeEDA']
+__all__ = ["RecipeEDA"]

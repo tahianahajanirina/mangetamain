@@ -1,35 +1,37 @@
-from transformers import pipeline
 from functools import wraps
+
+from transformers import pipeline
 
 
 def load_model(func):
     """Décorateur qui s'assure que le modèle est chargé avant d'exécuter la fonction"""
+
     @wraps(func)
     def wrapper(cls, *args, **kwargs):
         if cls._sentiment_analyzer is None:
             cls._sentiment_analyzer = pipeline(
-                "sentiment-analysis",
-                model=cls._model_name
+                "sentiment-analysis", model=cls._model_name
             )
         return func(cls, *args, **kwargs)
+
     return wrapper
 
 
 class SentimentAnalyzer:
     """Analyseur de sentiment pour les avis de recettes"""
-    
+
     _sentiment_analyzer = None
     _model_name = "TahianaAndriambahoaka/sentiment-analysis-food-reviews"
-    
+
     @classmethod
     @load_model
     def predict_sentiment(cls, text):
         """
         Prédit le sentiment d'un texte
-        
+
         Args:
             text (str): Le texte à analyser
-            
+
         Returns:
             tuple: (label, confidence_score)
                 - label (str): "negative", "neutral" ou "positive"
@@ -37,5 +39,5 @@ class SentimentAnalyzer:
         """
         # Prédiction
         result = cls._sentiment_analyzer(text)
-        
-        return result[0]['label'], result[0]['score']
+
+        return result[0]["label"], result[0]["score"]

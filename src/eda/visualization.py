@@ -35,7 +35,7 @@ class RecipeEDA:
         df: pd.DataFrame,
         figure_dir: Optional[Path] = None,
         style: str = "seaborn-v0_8-darkgrid",
-        palette: str = "husl"
+        palette: str = "husl",
     ):
         """Initialize the EDA class.
 
@@ -62,7 +62,7 @@ class RecipeEDA:
         """
         if self.figure_dir:
             filepath = self.figure_dir / filename
-            plt.savefig(filepath, dpi=dpi, bbox_inches='tight')
+            plt.savefig(filepath, dpi=dpi, bbox_inches="tight")
             logger.info(f"Saved figure: {filepath}")
 
     def plot_time_distribution(self, figsize: Tuple[int, int] = (14, 5)):
@@ -76,34 +76,36 @@ class RecipeEDA:
         fig, axes = plt.subplots(1, 2, figsize=figsize)
 
         # Raw distribution
-        axes[0].hist(self.df['minutes'], bins=100, edgecolor='black', alpha=0.7)
-        axes[0].set_xlabel('Minutes')
-        axes[0].set_ylabel('Frequency')
-        axes[0].set_title('Recipe Time Distribution (All)')
+        axes[0].hist(self.df["minutes"], bins=100, edgecolor="black", alpha=0.7)
+        axes[0].set_xlabel("Minutes")
+        axes[0].set_ylabel("Frequency")
+        axes[0].set_title("Recipe Time Distribution (All)")
         axes[0].axvline(
-            self.df['minutes'].median(),
-            color='red',
-            linestyle='--',
-            label=f'Median: {self.df["minutes"].median():.0f} min'
+            self.df["minutes"].median(),
+            color="red",
+            linestyle="--",
+            label=f'Median: {self.df["minutes"].median():.0f} min',
         )
         axes[0].legend()
 
         # Filtered distribution (< 500 minutes for detail)
-        filtered_data = self.df[self.df['minutes'] <= 500]['minutes']
-        axes[1].hist(filtered_data, bins=50, edgecolor='black', alpha=0.7, color='green')
-        axes[1].set_xlabel('Minutes')
-        axes[1].set_ylabel('Frequency')
-        axes[1].set_title('Recipe Time Distribution (≤ 500 min)')
+        filtered_data = self.df[self.df["minutes"] <= 500]["minutes"]
+        axes[1].hist(
+            filtered_data, bins=50, edgecolor="black", alpha=0.7, color="green"
+        )
+        axes[1].set_xlabel("Minutes")
+        axes[1].set_ylabel("Frequency")
+        axes[1].set_title("Recipe Time Distribution (≤ 500 min)")
         axes[1].axvline(
             filtered_data.median(),
-            color='red',
-            linestyle='--',
-            label=f'Median: {filtered_data.median():.0f} min'
+            color="red",
+            linestyle="--",
+            label=f"Median: {filtered_data.median():.0f} min",
         )
         axes[1].legend()
 
         plt.tight_layout()
-        self._save_figure('time_distribution.png')
+        self._save_figure("time_distribution.png")
         plt.show()
 
     def plot_time_vs_features(self, figsize: Tuple[int, int] = (15, 10)):
@@ -115,78 +117,74 @@ class RecipeEDA:
         logger.info("Plotting time vs features")
 
         # Filter for visualization
-        df_viz = self.df[self.df['minutes'] <= 500].copy()
+        df_viz = self.df[self.df["minutes"] <= 500].copy()
 
         fig, axes = plt.subplots(2, 3, figsize=figsize)
 
         # Minutes vs n_steps
-        axes[0, 0].scatter(
-            df_viz['n_steps'], df_viz['minutes'], alpha=0.3, s=10
-        )
-        axes[0, 0].set_xlabel('Number of Steps')
-        axes[0, 0].set_ylabel('Minutes')
-        axes[0, 0].set_title('Time vs Number of Steps')
+        axes[0, 0].scatter(df_viz["n_steps"], df_viz["minutes"], alpha=0.3, s=10)
+        axes[0, 0].set_xlabel("Number of Steps")
+        axes[0, 0].set_ylabel("Minutes")
+        axes[0, 0].set_title("Time vs Number of Steps")
 
         # Minutes vs n_ingredients
-        axes[0, 1].scatter(
-            df_viz['n_ingredients'], df_viz['minutes'], alpha=0.3, s=10
-        )
-        axes[0, 1].set_xlabel('Number of Ingredients')
-        axes[0, 1].set_ylabel('Minutes')
-        axes[0, 1].set_title('Time vs Number of Ingredients')
+        axes[0, 1].scatter(df_viz["n_ingredients"], df_viz["minutes"], alpha=0.3, s=10)
+        axes[0, 1].set_xlabel("Number of Ingredients")
+        axes[0, 1].set_ylabel("Minutes")
+        axes[0, 1].set_title("Time vs Number of Ingredients")
 
         # Minutes vs cooking_verb_count
-        if 'cooking_verb_count' in df_viz.columns:
+        if "cooking_verb_count" in df_viz.columns:
             axes[0, 2].scatter(
-                df_viz['cooking_verb_count'], df_viz['minutes'], alpha=0.3, s=10
+                df_viz["cooking_verb_count"], df_viz["minutes"], alpha=0.3, s=10
             )
-            axes[0, 2].set_xlabel('Cooking Verb Count')
-            axes[0, 2].set_ylabel('Minutes')
-            axes[0, 2].set_title('Time vs Cooking Verbs')
+            axes[0, 2].set_xlabel("Cooking Verb Count")
+            axes[0, 2].set_ylabel("Minutes")
+            axes[0, 2].set_title("Time vs Cooking Verbs")
 
         # Minutes vs equipment_count
-        if 'equipment_count' in df_viz.columns:
+        if "equipment_count" in df_viz.columns:
             axes[1, 0].scatter(
-                df_viz['equipment_count'], df_viz['minutes'], alpha=0.3, s=10
+                df_viz["equipment_count"], df_viz["minutes"], alpha=0.3, s=10
             )
-            axes[1, 0].set_xlabel('Equipment Count')
-            axes[1, 0].set_ylabel('Minutes')
-            axes[1, 0].set_title('Time vs Equipment Count')
+            axes[1, 0].set_xlabel("Equipment Count")
+            axes[1, 0].set_ylabel("Minutes")
+            axes[1, 0].set_title("Time vs Equipment Count")
 
         # Box plot by n_steps bins
-        df_viz['steps_bin'] = pd.cut(
-            df_viz['n_steps'],
+        df_viz["steps_bin"] = pd.cut(
+            df_viz["n_steps"],
             bins=[0, 5, 10, 15, 100],
-            labels=['1-5', '6-10', '11-15', '15+']
+            labels=["1-5", "6-10", "11-15", "15+"],
         )
-        df_viz.boxplot(column='minutes', by='steps_bin', ax=axes[1, 1])
-        axes[1, 1].set_xlabel('Number of Steps')
-        axes[1, 1].set_ylabel('Minutes')
-        axes[1, 1].set_title('Time Distribution by Step Count')
+        df_viz.boxplot(column="minutes", by="steps_bin", ax=axes[1, 1])
+        axes[1, 1].set_xlabel("Number of Steps")
+        axes[1, 1].set_ylabel("Minutes")
+        axes[1, 1].set_title("Time Distribution by Step Count")
         plt.sca(axes[1, 1])
         plt.xticks(rotation=0)
 
         # Box plot by n_ingredients bins
-        df_viz['ing_bin'] = pd.cut(
-            df_viz['n_ingredients'],
+        df_viz["ing_bin"] = pd.cut(
+            df_viz["n_ingredients"],
             bins=[0, 5, 10, 15, 50],
-            labels=['1-5', '6-10', '11-15', '15+']
+            labels=["1-5", "6-10", "11-15", "15+"],
         )
-        df_viz.boxplot(column='minutes', by='ing_bin', ax=axes[1, 2])
-        axes[1, 2].set_xlabel('Number of Ingredients')
-        axes[1, 2].set_ylabel('Minutes')
-        axes[1, 2].set_title('Time Distribution by Ingredient Count')
+        df_viz.boxplot(column="minutes", by="ing_bin", ax=axes[1, 2])
+        axes[1, 2].set_xlabel("Number of Ingredients")
+        axes[1, 2].set_ylabel("Minutes")
+        axes[1, 2].set_title("Time Distribution by Ingredient Count")
         plt.sca(axes[1, 2])
         plt.xticks(rotation=0)
 
         plt.tight_layout()
-        self._save_figure('time_vs_features.png')
+        self._save_figure("time_vs_features.png")
         plt.show()
 
     def plot_nutrition_correlation(
         self,
         figsize: Tuple[int, int] = (10, 8),
-        nutrition_cols: Optional[List[str]] = None
+        nutrition_cols: Optional[List[str]] = None,
     ):
         """Plot correlation matrix of nutritional features.
 
@@ -198,8 +196,13 @@ class RecipeEDA:
 
         if nutrition_cols is None:
             nutrition_cols = [
-                'calories', 'total_fat_pdv', 'sugar_pdv', 'sodium_pdv',
-                'protein_pdv', 'saturated_fat_pdv', 'carbs_pdv'
+                "calories",
+                "total_fat_pdv",
+                "sugar_pdv",
+                "sodium_pdv",
+                "protein_pdv",
+                "saturated_fat_pdv",
+                "carbs_pdv",
             ]
 
         # Filter available columns
@@ -211,21 +214,21 @@ class RecipeEDA:
         sns.heatmap(
             corr_matrix,
             annot=True,
-            fmt='.2f',
-            cmap='coolwarm',
+            fmt=".2f",
+            cmap="coolwarm",
             center=0,
             square=True,
-            linewidths=1
+            linewidths=1,
         )
-        plt.title('Nutritional Features Correlation Matrix', fontsize=14, pad=20)
+        plt.title("Nutritional Features Correlation Matrix", fontsize=14, pad=20)
         plt.tight_layout()
-        self._save_figure('nutrition_correlation.png')
+        self._save_figure("nutrition_correlation.png")
         plt.show()
 
     def plot_nutrition_distributions(
         self,
         figsize: Tuple[int, int] = (15, 10),
-        nutrition_cols: Optional[List[str]] = None
+        nutrition_cols: Optional[List[str]] = None,
     ):
         """Plot distributions of nutritional values.
 
@@ -237,8 +240,13 @@ class RecipeEDA:
 
         if nutrition_cols is None:
             nutrition_cols = [
-                'calories', 'total_fat_pdv', 'sugar_pdv', 'sodium_pdv',
-                'protein_pdv', 'saturated_fat_pdv', 'carbs_pdv'
+                "calories",
+                "total_fat_pdv",
+                "sugar_pdv",
+                "sodium_pdv",
+                "protein_pdv",
+                "saturated_fat_pdv",
+                "carbs_pdv",
             ]
 
         nutrition_cols = [col for col in nutrition_cols if col in self.df.columns]
@@ -250,29 +258,24 @@ class RecipeEDA:
         axes = axes.flatten() if n_rows > 1 else [axes]
 
         for idx, col in enumerate(nutrition_cols):
-            axes[idx].hist(
-                self.df[col].dropna(),
-                bins=50,
-                edgecolor='black',
-                alpha=0.7
-            )
-            axes[idx].set_xlabel(col.replace('_', ' ').title())
-            axes[idx].set_ylabel('Frequency')
+            axes[idx].hist(self.df[col].dropna(), bins=50, edgecolor="black", alpha=0.7)
+            axes[idx].set_xlabel(col.replace("_", " ").title())
+            axes[idx].set_ylabel("Frequency")
             axes[idx].set_title(f'{col.replace("_", " ").title()} Distribution')
             axes[idx].axvline(
                 self.df[col].median(),
-                color='red',
-                linestyle='--',
-                label=f'Median: {self.df[col].median():.1f}'
+                color="red",
+                linestyle="--",
+                label=f"Median: {self.df[col].median():.1f}",
             )
             axes[idx].legend()
 
         # Hide extra subplots
         for idx in range(len(nutrition_cols), len(axes)):
-            axes[idx].axis('off')
+            axes[idx].axis("off")
 
         plt.tight_layout()
-        self._save_figure('nutrition_distributions.png')
+        self._save_figure("nutrition_distributions.png")
         plt.show()
 
     def plot_nutrition_pca(self, figsize: Tuple[int, int] = (14, 5)):
@@ -283,7 +286,7 @@ class RecipeEDA:
         """
         logger.info("Plotting nutrition PCA")
 
-        if 'nutrition_pc1' not in self.df.columns:
+        if "nutrition_pc1" not in self.df.columns:
             logger.warning("PCA features not found. Skipping PCA plot.")
             return
 
@@ -291,41 +294,41 @@ class RecipeEDA:
 
         # Scatter plot of PC1 vs PC2
         scatter = axes[0].scatter(
-            self.df['nutrition_pc1'],
-            self.df['nutrition_pc2'],
-            c=self.df['calories'],
+            self.df["nutrition_pc1"],
+            self.df["nutrition_pc2"],
+            c=self.df["calories"],
             alpha=0.3,
             s=10,
-            cmap='viridis'
+            cmap="viridis",
         )
-        axes[0].set_xlabel('PC1')
-        axes[0].set_ylabel('PC2')
-        axes[0].set_title('Nutrition PCA: PC1 vs PC2 (colored by calories)')
-        plt.colorbar(scatter, ax=axes[0], label='Calories')
+        axes[0].set_xlabel("PC1")
+        axes[0].set_ylabel("PC2")
+        axes[0].set_title("Nutrition PCA: PC1 vs PC2 (colored by calories)")
+        plt.colorbar(scatter, ax=axes[0], label="Calories")
 
         # PC1 vs PC3
         scatter2 = axes[1].scatter(
-            self.df['nutrition_pc1'],
-            self.df['nutrition_pc3'],
-            c=self.df['protein_pdv'],
+            self.df["nutrition_pc1"],
+            self.df["nutrition_pc3"],
+            c=self.df["protein_pdv"],
             alpha=0.3,
             s=10,
-            cmap='plasma'
+            cmap="plasma",
         )
-        axes[1].set_xlabel('PC1')
-        axes[1].set_ylabel('PC3')
-        axes[1].set_title('Nutrition PCA: PC1 vs PC3 (colored by protein)')
-        plt.colorbar(scatter2, ax=axes[1], label='Protein PDV')
+        axes[1].set_xlabel("PC1")
+        axes[1].set_ylabel("PC3")
+        axes[1].set_title("Nutrition PCA: PC1 vs PC3 (colored by protein)")
+        plt.colorbar(scatter2, ax=axes[1], label="Protein PDV")
 
         plt.tight_layout()
-        self._save_figure('nutrition_pca.png')
+        self._save_figure("nutrition_pca.png")
         plt.show()
 
     def plot_feature_importance_preview(
         self,
-        target: str = 'minutes',
+        target: str = "minutes",
         top_n: int = 15,
-        figsize: Tuple[int, int] = (10, 8)
+        figsize: Tuple[int, int] = (10, 8),
     ):
         """Plot feature correlation with target.
 
@@ -349,11 +352,11 @@ class RecipeEDA:
 
         # Plot
         plt.figure(figsize=figsize)
-        top_features.sort_values().plot(kind='barh')
-        plt.xlabel('Absolute Correlation')
-        plt.title(f'Top {top_n} Features Correlated with {target}')
+        top_features.sort_values().plot(kind="barh")
+        plt.xlabel("Absolute Correlation")
+        plt.title(f"Top {top_n} Features Correlated with {target}")
         plt.tight_layout()
-        self._save_figure(f'feature_correlation_{target}.png')
+        self._save_figure(f"feature_correlation_{target}.png")
         plt.show()
 
     def generate_time_prediction_report(self):
@@ -362,7 +365,7 @@ class RecipeEDA:
 
         self.plot_time_distribution()
         self.plot_time_vs_features()
-        self.plot_feature_importance_preview(target='minutes')
+        self.plot_feature_importance_preview(target="minutes")
 
         logger.info("Time prediction EDA report completed")
 
@@ -373,6 +376,6 @@ class RecipeEDA:
         self.plot_nutrition_distributions()
         self.plot_nutrition_correlation()
         self.plot_nutrition_pca()
-        self.plot_feature_importance_preview(target='calories')
+        self.plot_feature_importance_preview(target="calories")
 
         logger.info("Nutrition estimation EDA report completed")

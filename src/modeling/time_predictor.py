@@ -6,20 +6,20 @@ for the recipe preparation time prediction task.
 
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
-import joblib
+from typing import Any, Dict, List, Optional, Tuple
 
+import joblib
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.linear_model import LinearRegression, Ridge
-from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import (
     mean_absolute_error,
+    mean_absolute_percentage_error,
     mean_squared_error,
     r2_score,
-    mean_absolute_percentage_error
 )
+from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.preprocessing import StandardScaler
 
 logger = logging.getLogger(__name__)
@@ -65,7 +65,7 @@ class TimePredictionModel:
             "linear": LinearRegression,
             "ridge": Ridge,
             "random_forest": RandomForestRegressor,
-            "gradient_boosting": GradientBoostingRegressor
+            "gradient_boosting": GradientBoostingRegressor,
         }
 
         if model_type not in models:
@@ -77,10 +77,7 @@ class TimePredictionModel:
         return models[model_type](**params)
 
     def prepare_features(
-        self,
-        df: pd.DataFrame,
-        feature_cols: List[str],
-        target_col: str = "minutes"
+        self, df: pd.DataFrame, feature_cols: List[str], target_col: str = "minutes"
     ) -> Tuple[pd.DataFrame, pd.Series]:
         """Prepare features and target for modeling.
 
@@ -113,10 +110,7 @@ class TimePredictionModel:
         return X, y
 
     def train(
-        self,
-        X_train: pd.DataFrame,
-        y_train: pd.Series,
-        scale_features: bool = True
+        self, X_train: pd.DataFrame, y_train: pd.Series, scale_features: bool = True
     ):
         """Train the model.
 
@@ -149,10 +143,7 @@ class TimePredictionModel:
         return self.model.predict(X)
 
     def evaluate(
-        self,
-        X_test: pd.DataFrame,
-        y_test: pd.Series,
-        scale_features: bool = True
+        self, X_test: pd.DataFrame, y_test: pd.Series, scale_features: bool = True
     ) -> Dict[str, float]:
         """Evaluate model performance.
 
@@ -172,18 +163,14 @@ class TimePredictionModel:
             "mae": mean_absolute_error(y_test, y_pred),
             "rmse": np.sqrt(mean_squared_error(y_test, y_pred)),
             "r2": r2_score(y_test, y_pred),
-            "mape": mean_absolute_percentage_error(y_test, y_pred)
+            "mape": mean_absolute_percentage_error(y_test, y_pred),
         }
 
         logger.info(f"Evaluation metrics: {self.metrics}")
         return self.metrics
 
     def cross_validate(
-        self,
-        X: pd.DataFrame,
-        y: pd.Series,
-        cv: int = 5,
-        scale_features: bool = True
+        self, X: pd.DataFrame, y: pd.Series, cv: int = 5, scale_features: bool = True
     ) -> Dict[str, float]:
         """Perform cross-validation.
 
@@ -202,15 +189,10 @@ class TimePredictionModel:
             X = self.scaler.fit_transform(X)
 
         scores = cross_val_score(
-            self.model, X, y,
-            cv=cv,
-            scoring='neg_mean_absolute_error'
+            self.model, X, y, cv=cv, scoring="neg_mean_absolute_error"
         )
 
-        cv_metrics = {
-            "cv_mae_mean": -scores.mean(),
-            "cv_mae_std": scores.std()
-        }
+        cv_metrics = {"cv_mae_mean": -scores.mean(), "cv_mae_std": scores.std()}
 
         logger.info(f"CV metrics: {cv_metrics}")
         return cv_metrics
@@ -227,15 +209,15 @@ class TimePredictionModel:
         Raises:
             ValueError: If model doesn't support feature importance.
         """
-        if not hasattr(self.model, 'feature_importances_'):
-            raise ValueError(
-                f"{self.model_type} doesn't support feature importance"
-            )
+        if not hasattr(self.model, "feature_importances_"):
+            raise ValueError(f"{self.model_type} doesn't support feature importance")
 
-        importance_df = pd.DataFrame({
-            'feature': self.feature_names,
-            'importance': self.model.feature_importances_
-        }).sort_values('importance', ascending=False)
+        importance_df = pd.DataFrame(
+            {
+                "feature": self.feature_names,
+                "importance": self.model.feature_importances_,
+            }
+        ).sort_values("importance", ascending=False)
 
         if top_n:
             importance_df = importance_df.head(top_n)
@@ -249,11 +231,11 @@ class TimePredictionModel:
             filepath: Path to save the model.
         """
         model_data = {
-            'model': self.model,
-            'scaler': self.scaler,
-            'feature_names': self.feature_names,
-            'metrics': self.metrics,
-            'model_type': self.model_type
+            "model": self.model,
+            "scaler": self.scaler,
+            "feature_names": self.feature_names,
+            "metrics": self.metrics,
+            "model_type": self.model_type,
         }
 
         filepath.parent.mkdir(parents=True, exist_ok=True)
@@ -261,7 +243,7 @@ class TimePredictionModel:
         logger.info(f"Model saved to {filepath}")
 
     @classmethod
-    def load_model(cls, filepath: Path) -> 'TimePredictionModel':
+    def load_model(cls, filepath: Path) -> "TimePredictionModel":
         """Load model from file.
 
         Args:
@@ -273,11 +255,11 @@ class TimePredictionModel:
         logger.info(f"Loading model from {filepath}")
         model_data = joblib.load(filepath)
 
-        instance = cls(model_type=model_data['model_type'])
-        instance.model = model_data['model']
-        instance.scaler = model_data['scaler']
-        instance.feature_names = model_data['feature_names']
-        instance.metrics = model_data['metrics']
+        instance = cls(model_type=model_data["model_type"])
+        instance.model = model_data["model"]
+        instance.scaler = model_data["scaler"]
+        instance.feature_names = model_data["feature_names"]
+        instance.metrics = model_data["metrics"]
 
         return instance
 
@@ -289,7 +271,7 @@ def train_and_evaluate_time_model(
     model_type: str = "random_forest",
     test_size: float = 0.2,
     random_state: int = 42,
-    **model_params
+    **model_params,
 ) -> Tuple[TimePredictionModel, Dict[str, float]]:
     """Train and evaluate a time prediction model.
 
@@ -311,17 +293,17 @@ def train_and_evaluate_time_model(
     model_params_copy = model_params.copy()
 
     # Models that support random_state parameter
-    models_with_random_state = {'ridge', 'random_forest', 'gradient_boosting'}
+    models_with_random_state = {"ridge", "random_forest", "gradient_boosting"}
 
     # Only add random_state if the model supports it and it's not already specified
-    if model_type in models_with_random_state and 'random_state' not in model_params_copy:
-        model_params_copy['random_state'] = random_state
+    if (
+        model_type in models_with_random_state
+        and "random_state" not in model_params_copy
+    ):
+        model_params_copy["random_state"] = random_state
 
     # Initialize model
-    model = TimePredictionModel(
-        model_type=model_type,
-        **model_params_copy
-    )
+    model = TimePredictionModel(model_type=model_type, **model_params_copy)
 
     # Prepare features
     X, y = model.prepare_features(df, feature_cols, target_col)
@@ -337,6 +319,8 @@ def train_and_evaluate_time_model(
     # Evaluate model
     metrics = model.evaluate(X_test, y_test)
 
-    logger.info(f"Model training completed. R²: {metrics['r2']:.4f}, MAE: {metrics['mae']:.2f}")
+    logger.info(
+        f"Model training completed. R²: {metrics['r2']:.4f}, MAE: {metrics['mae']:.2f}"
+    )
 
     return model, metrics

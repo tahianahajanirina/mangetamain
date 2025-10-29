@@ -6,22 +6,21 @@ for the nutritional value estimation and tagging task.
 
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
-import joblib
+from typing import Any, Dict, List, Optional, Tuple
 
+import joblib
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import (
     accuracy_score,
+    classification_report,
+    f1_score,
     precision_score,
     recall_score,
-    f1_score,
-    classification_report,
-    confusion_matrix
 )
+from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.preprocessing import StandardScaler
 
 logger = logging.getLogger(__name__)
@@ -74,7 +73,7 @@ class NutritionTaggerModel:
         models = {
             "logistic": LogisticRegression,
             "random_forest": RandomForestClassifier,
-            "gradient_boosting": GradientBoostingClassifier
+            "gradient_boosting": GradientBoostingClassifier,
         }
 
         if model_type not in models:
@@ -86,10 +85,7 @@ class NutritionTaggerModel:
         return models[model_type](**params)
 
     def prepare_features(
-        self,
-        df: pd.DataFrame,
-        feature_cols: List[str],
-        target_col: str
+        self, df: pd.DataFrame, feature_cols: List[str], target_col: str
     ) -> Tuple[pd.DataFrame, pd.Series]:
         """Prepare features and target for modeling.
 
@@ -127,10 +123,7 @@ class NutritionTaggerModel:
         return X, y
 
     def train(
-        self,
-        X_train: pd.DataFrame,
-        y_train: pd.Series,
-        scale_features: bool = True
+        self, X_train: pd.DataFrame, y_train: pd.Series, scale_features: bool = True
     ):
         """Train the model.
 
@@ -162,11 +155,7 @@ class NutritionTaggerModel:
 
         return self.model.predict(X)
 
-    def predict_proba(
-        self,
-        X: pd.DataFrame,
-        scale_features: bool = True
-    ) -> np.ndarray:
+    def predict_proba(self, X: pd.DataFrame, scale_features: bool = True) -> np.ndarray:
         """Predict class probabilities.
 
         Args:
@@ -182,10 +171,7 @@ class NutritionTaggerModel:
         return self.model.predict_proba(X)
 
     def evaluate(
-        self,
-        X_test: pd.DataFrame,
-        y_test: pd.Series,
-        scale_features: bool = True
+        self, X_test: pd.DataFrame, y_test: pd.Series, scale_features: bool = True
     ) -> Dict[str, float]:
         """Evaluate model performance.
 
@@ -203,22 +189,22 @@ class NutritionTaggerModel:
 
         self.metrics = {
             "accuracy": accuracy_score(y_test, y_pred),
-            "precision": precision_score(y_test, y_pred, average='weighted', zero_division=0),
-            "recall": recall_score(y_test, y_pred, average='weighted', zero_division=0),
-            "f1": f1_score(y_test, y_pred, average='weighted', zero_division=0)
+            "precision": precision_score(
+                y_test, y_pred, average="weighted", zero_division=0
+            ),
+            "recall": recall_score(y_test, y_pred, average="weighted", zero_division=0),
+            "f1": f1_score(y_test, y_pred, average="weighted", zero_division=0),
         }
 
         logger.info(f"Evaluation metrics: {self.metrics}")
-        logger.info(f"\nClassification Report:\n{classification_report(y_test, y_pred)}")
+        logger.info(
+            f"\nClassification Report:\n{classification_report(y_test, y_pred)}"
+        )
 
         return self.metrics
 
     def cross_validate(
-        self,
-        X: pd.DataFrame,
-        y: pd.Series,
-        cv: int = 5,
-        scale_features: bool = True
+        self, X: pd.DataFrame, y: pd.Series, cv: int = 5, scale_features: bool = True
     ) -> Dict[str, float]:
         """Perform cross-validation.
 
@@ -236,16 +222,9 @@ class NutritionTaggerModel:
         if scale_features:
             X = self.scaler.fit_transform(X)
 
-        scores = cross_val_score(
-            self.model, X, y,
-            cv=cv,
-            scoring='f1_weighted'
-        )
+        scores = cross_val_score(self.model, X, y, cv=cv, scoring="f1_weighted")
 
-        cv_metrics = {
-            "cv_f1_mean": scores.mean(),
-            "cv_f1_std": scores.std()
-        }
+        cv_metrics = {"cv_f1_mean": scores.mean(), "cv_f1_std": scores.std()}
 
         logger.info(f"CV metrics: {cv_metrics}")
         return cv_metrics
@@ -262,19 +241,16 @@ class NutritionTaggerModel:
         Raises:
             ValueError: If model doesn't support feature importance.
         """
-        if hasattr(self.model, 'feature_importances_'):
+        if hasattr(self.model, "feature_importances_"):
             importances = self.model.feature_importances_
-        elif hasattr(self.model, 'coef_'):
+        elif hasattr(self.model, "coef_"):
             importances = np.abs(self.model.coef_[0])
         else:
-            raise ValueError(
-                f"{self.model_type} doesn't support feature importance"
-            )
+            raise ValueError(f"{self.model_type} doesn't support feature importance")
 
-        importance_df = pd.DataFrame({
-            'feature': self.feature_names,
-            'importance': importances
-        }).sort_values('importance', ascending=False)
+        importance_df = pd.DataFrame(
+            {"feature": self.feature_names, "importance": importances}
+        ).sort_values("importance", ascending=False)
 
         if top_n:
             importance_df = importance_df.head(top_n)
@@ -288,12 +264,12 @@ class NutritionTaggerModel:
             filepath: Path to save the model.
         """
         model_data = {
-            'model': self.model,
-            'scaler': self.scaler,
-            'feature_names': self.feature_names,
-            'metrics': self.metrics,
-            'model_type': self.model_type,
-            'target_name': self.target_name
+            "model": self.model,
+            "scaler": self.scaler,
+            "feature_names": self.feature_names,
+            "metrics": self.metrics,
+            "model_type": self.model_type,
+            "target_name": self.target_name,
         }
 
         filepath.parent.mkdir(parents=True, exist_ok=True)
@@ -301,7 +277,7 @@ class NutritionTaggerModel:
         logger.info(f"Model saved to {filepath}")
 
     @classmethod
-    def load_model(cls, filepath: Path) -> 'NutritionTaggerModel':
+    def load_model(cls, filepath: Path) -> "NutritionTaggerModel":
         """Load model from file.
 
         Args:
@@ -313,12 +289,12 @@ class NutritionTaggerModel:
         logger.info(f"Loading model from {filepath}")
         model_data = joblib.load(filepath)
 
-        instance = cls(model_type=model_data['model_type'])
-        instance.model = model_data['model']
-        instance.scaler = model_data['scaler']
-        instance.feature_names = model_data['feature_names']
-        instance.metrics = model_data['metrics']
-        instance.target_name = model_data['target_name']
+        instance = cls(model_type=model_data["model_type"])
+        instance.model = model_data["model"]
+        instance.scaler = model_data["scaler"]
+        instance.feature_names = model_data["feature_names"]
+        instance.metrics = model_data["metrics"]
+        instance.target_name = model_data["target_name"]
 
         return instance
 
@@ -330,7 +306,7 @@ def train_and_evaluate_nutrition_model(
     model_type: str = "random_forest",
     test_size: float = 0.2,
     random_state: int = 42,
-    **model_params
+    **model_params,
 ) -> Tuple[NutritionTaggerModel, Dict[str, float]]:
     """Train and evaluate a nutrition tagging model.
 

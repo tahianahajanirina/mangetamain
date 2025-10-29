@@ -1,5 +1,6 @@
-from huggingface_hub import HfApi, login
 import os
+
+from huggingface_hub import HfApi, login
 
 # 1. Se connecter à Hugging Face
 print("Connexion à Hugging Face...")
@@ -24,8 +25,10 @@ api = HfApi()
 api.upload_folder(
     folder_path=model_path,
     repo_id="TahianaAndriambahoaka/sentiment-analysis-food-reviews",
-    repo_type="model"
+    repo_type="model",
 )
 
 print("✅ Upload terminé avec succès!")
-print("Votre modèle est disponible sur: https://huggingface.co/TahianaAndriambahoaka/sentiment-analysis-food-reviews")
+print(
+    "Votre modèle est disponible sur: https://huggingface.co/TahianaAndriambahoaka/sentiment-analysis-food-reviews"
+)
