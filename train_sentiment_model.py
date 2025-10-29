@@ -96,7 +96,7 @@ import os
 IS_CI = os.getenv('CI') == 'true' or os.getenv('GITHUB_ACTIONS') == 'true'
 
 # Adjust sample size based on environment
-SAMPLE_SIZE = 5000 if IS_CI else 50000  # Much smaller for CI/CD
+SAMPLE_SIZE = 4000 if IS_CI else 50000  # Much smaller for CI/CD
 print(f"\nEnvironment: {'CI/CD' if IS_CI else 'Local'}")
 print(f"Target sample size: {SAMPLE_SIZE:,}")
 
