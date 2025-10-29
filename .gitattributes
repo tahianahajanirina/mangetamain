@@ -1,3 +1,4 @@
 data/raw/*.csv filter=lfs diff=lfs merge=lfs -text
 outputs/models/*.json filter=lfs diff=lfs merge=lfs -text
 outputs/models/*.pkl filter=lfs diff=lfs merge=lfs -text
+data/processed/*.csv filter=lfs diff=lfs merge=lfs -text
