@@ -23,6 +23,8 @@ MANIFEST
 
 # Jupyter Notebook
 .ipynb_checkpoints
+*.ipynb
+notebooks/
 
 # Environnements virtuels
 env/
@@ -42,9 +44,13 @@ venv.bak/
 data/raw/*.csv
 data/raw/*.json
 data/raw/*.parquet
+data/raw/*.zip
 data/processed/*.csv
 data/processed/*.json
 data/processed/*.parquet
+
+# Keep .gitkeep files for directory structure
+!data/*/.gitkeep
 
 # Outputs
 outputs/models/*.pkl
@@ -55,6 +61,16 @@ outputs/figures/*.jpg
 outputs/figures/*.pdf
 outputs/reports/*.html
 outputs/reports/*.pdf
+
+# Models and checkpoints - Downloaded from Hugging Face Hub at runtime
+outputs/models/
+outputs/sentiment_model/
+outputs/figures/
+outputs/reports/
+
+# Keep only .gitkeep files
+!outputs/*/.gitkeep
+!outputs/*/*/.gitkeep
 
 # Logs
 *.log
@@ -71,3 +87,33 @@ Thumbs.db
 # Variables d'environnement
 .env
 .env.local
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# GitHub Actions
+.github/
+
+# Documentation (except README)
+*.md
+!README.md
+docs/
+SETUP_GUIDE.md
+QUICK_START.md
+DEPLOYMENT_GUIDE*.md
+PIPELINE_EXPLAINED.md
+
+# Tests
+tests/
+pytest.ini
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Scripts not needed in production
+scripts/download_kaggle_data.py
+scripts/upload_models_to_hf.py
+scripts/clean_data.py
+scripts/run_*.py
