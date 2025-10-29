@@ -44,13 +44,15 @@ class TestRecipeDataLoader:
     def test_load_empty_file(self, temp_data_dir):
         """Test loading empty CSV file."""
         csv_path = temp_data_dir['raw'] / 'empty.csv'
-        pd.DataFrame().to_csv(csv_path, index=False)
+        # Create CSV with headers but no data
+        pd.DataFrame(columns=['id', 'name', 'minutes']).to_csv(csv_path, index=False)
         
         loader = RecipeDataLoader(str(csv_path))
         df = loader.load_data()
         
         assert isinstance(df, pd.DataFrame)
         assert len(df) == 0
+        assert 'id' in df.columns
     
     def test_preprocess_basic(self, temp_data_dir, sample_recipes_df):
         """Test basic preprocessing."""

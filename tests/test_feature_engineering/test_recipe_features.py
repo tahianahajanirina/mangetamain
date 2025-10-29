@@ -20,71 +20,52 @@ class TestRecipeFeatureBuilder:
         builder = RecipeFeatureBuilder(min_rating=4.0)
         assert builder.min_rating == 4.0
     
-    def test_parse_nutrition_valid(self, sample_recipes_df):
-        """Test parsing nutrition information."""
+    def test_calculate_popularity_metrics(self, sample_recipes_df, sample_interactions_df):
+        """Test popularity metrics calculation."""
         builder = RecipeFeatureBuilder()
-        df = sample_recipes_df.copy()
         
-        result = builder._parse_nutrition(df)
+        result = builder.calculate_popularity_metrics(sample_recipes_df, sample_interactions_df)
         
-        assert 'calories' in result.columns
-        assert 'total_fat' in result.columns
-        assert 'sugar' in result.columns
-        assert 'sodium' in result.columns
-        assert 'protein' in result.columns
-        assert 'saturated_fat' in result.columns
-        assert 'carbohydrates' in result.columns
-        
-        # Check that values are numeric
-        assert pd.api.types.is_numeric_dtype(result['calories'])
-        assert result['calories'].notna().all()
+        assert 'n_interactions' in result.columns
+        assert 'avg_rating' in result.columns
+        assert pd.api.types.is_numeric_dtype(result['n_interactions'])
+        assert pd.api.types.is_numeric_dtype(result['avg_rating'])
     
-    def test_parse_nutrition_missing_values(self):
-        """Test parsing nutrition with missing values."""
-        df = pd.DataFrame({
-            'id': [1, 2, 3],
-            'nutrition': ['[100, 10, 5, 2, 8, 15, 3]', None, '[150, 12, 6, 3, 10, 18, 4]']
+    def test_calculate_health_category(self):
+        """Test health category calculation."""
+        builder = RecipeFeatureBuilder()
+        
+        # Create test recipe row with ALL required columns
+        recipe = pd.Series({
+            'calories': 250,
+            'total_fat': 10,
+            'sugar': 15,
+            'sodium': 500,
+            'protein': 20,
+            'saturated_fat': 5  # Added missing column
         })
         
-        builder = RecipeFeatureBuilder()
-        result = builder._parse_nutrition(df)
+        result = builder.calculate_health_category(recipe)
         
-        assert len(result) == 3
-        assert result['calories'].isna().sum() == 1
-    
-    def test_extract_tags_features(self, sample_recipes_df):
-        """Test extraction of tag-based features."""
-        builder = RecipeFeatureBuilder()
-        df = sample_recipes_df.copy()
-        
-        result = builder._extract_tags_features(df)
-        
-        # Check boolean columns exist
-        assert 'is_dessert' in result.columns
-        assert 'is_healthy' in result.columns
-        assert 'is_quick' in result.columns
-        
-        # Check they are boolean/binary
-        assert result['is_dessert'].isin([0, 1, True, False]).all()
-        
-    def test_calculate_complexity_score(self, sample_recipes_df):
-        """Test complexity score calculation."""
-        builder = RecipeFeatureBuilder()
-        df = sample_recipes_df.copy()
-        
-        result = builder._calculate_complexity_score(df)
-        
-        assert 'complexity_score' in result.columns
-        assert pd.api.types.is_numeric_dtype(result['complexity_score'])
-        assert (result['complexity_score'] >= 0).all()
+        assert isinstance(result, (int, np.integer))
+        assert 0 <= result <= 4
     
     def test_build_features_full_pipeline(self, temp_data_dir, sample_recipes_df, sample_interactions_df):
         """Test complete feature building pipeline."""
+        # Add required columns to sample data - MATCH the 5 rows in sample_recipes_df
+        df_recipes = sample_recipes_df.copy()
+        df_recipes['calories'] = [200, 300, 400, 150, 500]
+        df_recipes['total_fat'] = [10, 15, 20, 5, 25]
+        df_recipes['sugar'] = [5, 10, 15, 3, 18]
+        df_recipes['sodium'] = [500, 600, 700, 200, 800]
+        df_recipes['protein'] = [20, 25, 30, 8, 35]
+        df_recipes['saturated_fat'] = [3, 5, 7, 2, 8]  # Added missing column
+        
         # Save test data
         recipes_path = temp_data_dir['processed'] / 'recipes_clean.csv'
         interactions_path = temp_data_dir['processed'] / 'interactions_clean.csv'
         
-        sample_recipes_df.to_csv(recipes_path, index=False)
+        df_recipes.to_csv(recipes_path, index=False)
         sample_interactions_df.to_csv(interactions_path, index=False)
         
         builder = RecipeFeatureBuilder(min_rating=3.0)
@@ -96,16 +77,24 @@ class TestRecipeFeatureBuilder:
         assert isinstance(result, pd.DataFrame)
         assert len(result) > 0
         assert 'id' in result.columns
+        assert 'popularity_score' in result.columns
+        assert 'log_minutes' in result.columns
+        assert 'time_complexity' in result.columns
+        assert 'efficiency' in result.columns
+        assert 'health_category' in result.columns
         
-    def test_handle_invalid_nutrition_format(self):
-        """Test handling of invalid nutrition format."""
-        df = pd.DataFrame({
-            'id': [1, 2],
-            'nutrition': ['invalid', '[100, 10, 5]']  # invalid formats
-        })
+    def test_load_data(self, temp_data_dir, sample_recipes_df, sample_interactions_df):
+        """Test data loading."""
+        recipes_path = temp_data_dir['raw'] / 'recipes.csv'
+        interactions_path = temp_data_dir['raw'] / 'interactions.csv'
+        
+        sample_recipes_df.to_csv(recipes_path, index=False)
+        sample_interactions_df.to_csv(interactions_path, index=False)
         
         builder = RecipeFeatureBuilder()
-        result = builder._parse_nutrition(df)
+        recipes, interactions = builder.load_data(str(recipes_path), str(interactions_path))
         
-        # Should handle gracefully
-        assert len(result) == 2
+        assert isinstance(recipes, pd.DataFrame)
+        assert isinstance(interactions, pd.DataFrame)
+        assert len(recipes) == len(sample_recipes_df)
+        assert len(interactions) == len(sample_interactions_df)

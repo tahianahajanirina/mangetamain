@@ -13,68 +13,67 @@ class TestRecipeClusterer:
         """Test initialization with default parameters."""
         clusterer = RecipeClusterer()
         assert clusterer is not None
+        assert clusterer.pca_variance == 0.90
     
     def test_init_with_k(self):
         """Test initialization with specific k."""
         clusterer = RecipeClusterer(n_clusters=5)
         assert clusterer.n_clusters == 5
     
-    def test_fit_basic(self, sample_recipes_with_features):
-        """Test fitting the clustering model."""
+    def test_load_features(self, temp_data_dir, sample_recipes_with_features):
+        """Test loading features from file."""
+        # Add required columns for clustering
         df = sample_recipes_with_features.copy()
+        df['log_minutes'] = np.log1p(df['minutes'])
+        df['time_complexity'] = df['n_steps'] * df['n_ingredients']
+        df['efficiency'] = df['avg_rating'] / (1 + df['log_minutes'])
+        df['health_category'] = [1, 0, 0, 1, 1, 0, 1, 0, 1, 0]
+        df['popularity_score'] = df['avg_rating'] * df['num_ratings']
         
-        # Select only numeric features
-        feature_cols = ['minutes', 'n_steps', 'n_ingredients', 'calories', 
-                       'total_fat', 'sugar', 'protein']
-        X = df[feature_cols].fillna(0)
+        features_path = temp_data_dir['processed'] / 'recipe_features.csv'
+        df.to_csv(features_path, index=False)
         
-        clusterer = RecipeClusterer(n_clusters=2)
-        clusterer.fit(X)
+        clusterer = RecipeClusterer(n_clusters=3)
+        result = clusterer.load_features(str(features_path))
         
-        assert hasattr(clusterer, 'model')
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == len(df)
+        assert clusterer.recipes is not None
     
-    def test_predict(self, sample_recipes_with_features):
-        """Test prediction on new data."""
+    def test_prepare_features(self, temp_data_dir, sample_recipes_with_features):
+        """Test feature preparation (scaling and PCA)."""
         df = sample_recipes_with_features.copy()
+        df['log_minutes'] = np.log1p(df['minutes'])
+        df['time_complexity'] = df['n_steps'] * df['n_ingredients']
+        df['efficiency'] = df['avg_rating'] / (1 + df['log_minutes'])
+        df['health_category'] = [1, 0, 0, 1, 1, 0, 1, 0, 1, 0]
+        df['popularity_score'] = df['avg_rating'] * df['num_ratings']
         
-        feature_cols = ['minutes', 'n_steps', 'n_ingredients', 'calories', 
-                       'total_fat', 'sugar', 'protein']
-        X = df[feature_cols].fillna(0)
+        clusterer = RecipeClusterer(n_clusters=3)
+        clusterer.recipes = df
         
-        clusterer = RecipeClusterer(n_clusters=2)
-        clusterer.fit(X)
-        labels = clusterer.predict(X)
+        features_scaled, features_pca = clusterer.prepare_features()
         
-        assert len(labels) == len(df)
-        assert all(label in [0, 1] for label in labels)
+        assert features_scaled is not None
+        assert features_pca is not None
+        assert len(features_scaled) == len(df)
+        assert len(features_pca) == len(df)
     
-    def test_optimal_clusters(self, sample_recipes_with_features):
-        """Test finding optimal number of clusters."""
+    def test_fit_with_features_file(self, temp_data_dir, sample_recipes_with_features):
+        """Test complete fit pipeline with file path."""
         df = sample_recipes_with_features.copy()
+        df['log_minutes'] = np.log1p(df['minutes'])
+        df['time_complexity'] = df['n_steps'] * df['n_ingredients']
+        df['efficiency'] = df['avg_rating'] / (1 + df['log_minutes'])
+        df['health_category'] = [1, 0, 0, 1, 1, 0, 1, 0, 1, 0]
+        df['popularity_score'] = df['avg_rating'] * df['num_ratings']
         
-        feature_cols = ['minutes', 'n_steps', 'n_ingredients', 'calories']
-        X = df[feature_cols].fillna(0)
+        features_path = temp_data_dir['processed'] / 'recipe_features.csv'
+        df.to_csv(features_path, index=False)
         
-        clusterer = RecipeClusterer()
+        clusterer = RecipeClusterer(n_clusters=3)
+        clusterer.fit(str(features_path))
         
-        # Should be able to find optimal k
-        if hasattr(clusterer, 'find_optimal_clusters'):
-            k = clusterer.find_optimal_clusters(X, k_range=range(2, 4))
-            assert k >= 2
-            assert k < 4
-    
-    def test_fit_with_missing_values(self):
-        """Test handling of missing values."""
-        df = pd.DataFrame({
-            'calories': [100, np.nan, 300],
-            'protein': [10, 20, np.nan]
-        })
-        
-        clusterer = RecipeClusterer(n_clusters=2)
-        
-        # Should handle NaN values
-        X = df.fillna(0)
-        clusterer.fit(X)
-        labels = clusterer.predict(X)
-        
-        assert len(labels) == 3
+        assert clusterer.kmeans is not None
+        assert 'cluster' in clusterer.recipes.columns
+        assert clusterer.recipes['cluster'].nunique() == 3

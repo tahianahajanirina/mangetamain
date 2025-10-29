@@ -22,10 +22,12 @@ from config.config import DATA_RAW, DATA_PROCESSED
 
 def safe_eval(x):
     """Évalue en toute sécurité les chaînes représentant des listes"""
-    if pd.isna(x):
-        return []
+    # Check if it's already a list first
     if isinstance(x, list):
         return x
+    # Then check for NaN (works with scalars only)
+    if pd.isna(x):
+        return []
     try:
         import ast
         return ast.literal_eval(x)
