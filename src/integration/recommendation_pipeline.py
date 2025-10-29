@@ -15,6 +15,7 @@ from src.modeling.recipe_clustering import RecipeClusterer
 from src.modeling.time_predictor import TimePredictionModel
 from src.recommendation.svd_recommender import SVDRecommender
 from src.sentiment_analysis import SentimentAnalyzer
+from src.utils.data_cache import DataCache
 
 from .unified_data_loader import UnifiedRecipeDataLoader
 
@@ -417,8 +418,8 @@ class IntegratedRecommendationPipeline:
         """
         logger.info(f"Analyzing sentiment for recipe {recipe_id}...")
 
-        # Load interactions
-        interactions = pd.read_csv(self.interactions_path)
+        # Load interactions using cache
+        interactions = DataCache.get_interactions(path=str(self.interactions_path), optimize_dtypes=True)
 
         # Filter reviews for this recipe
         recipe_reviews = interactions[interactions["recipe_id"] == recipe_id].copy()

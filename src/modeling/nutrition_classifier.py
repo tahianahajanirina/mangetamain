@@ -18,6 +18,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, Tuple
 
+from src.utils.data_cache import DataCache
+
 import joblib
 import numpy as np
 import pandas as pd
@@ -97,7 +99,8 @@ class NutritionClassifier:
             Tuple (X features, y target)
         """
         logger.info(f"Chargement des données depuis {filepath}...")
-        df = pd.read_csv(filepath)
+        # Use global cache to avoid redundant loading
+        df = DataCache.get_recipes(path=str(filepath), optimize_dtypes=True)
 
         # Features pour le modèle (exclure id, name, target)
         feature_cols = [

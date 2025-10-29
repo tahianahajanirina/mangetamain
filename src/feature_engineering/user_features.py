@@ -11,6 +11,8 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
+from src.utils.data_cache import DataCache
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -31,8 +33,9 @@ class UserFeatureBuilder:
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """Charge les données nettoyées"""
         logger.info("Chargement des données...")
-        recipes = pd.read_csv(recipes_path)
-        interactions = pd.read_csv(interactions_path)
+        # Use global cache to avoid redundant loading
+        recipes = DataCache.get_recipes(path=recipes_path, optimize_dtypes=True)
+        interactions = DataCache.get_interactions(path=interactions_path, optimize_dtypes=True)
 
         logger.info(f"Recettes: {len(recipes):,}")
         logger.info(f"Interactions: {len(interactions):,}")

@@ -12,6 +12,8 @@ import google.generativeai as genai
 import numpy as np
 import pandas as pd
 
+from src.utils.data_cache import DataCache
+
 logger = logging.getLogger(__name__)
 
 
@@ -167,9 +169,9 @@ def create_chatbot(api_key: str, recipes_path: str) -> RecipeRAGChatbot:
     Returns:
         Initialized RecipeRAGChatbot instance
     """
-    # Load recipes
+    # Load recipes using cache
     logger.info(f"Loading recipes from {recipes_path}")
-    recipes_df = pd.read_csv(recipes_path)
+    recipes_df = DataCache.get_recipes(path=str(recipes_path), optimize_dtypes=True)
 
     # Parse tags if they exist
     if "tags" in recipes_df.columns:
