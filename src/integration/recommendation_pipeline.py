@@ -419,7 +419,9 @@ class IntegratedRecommendationPipeline:
         logger.info(f"Analyzing sentiment for recipe {recipe_id}...")
 
         # Load interactions using cache
-        interactions = DataCache.get_interactions(path=str(self.interactions_path), optimize_dtypes=True)
+        interactions = DataCache.get_interactions(
+            path=str(self.interactions_path), optimize_dtypes=True
+        )
 
         # Filter reviews for this recipe
         recipe_reviews = interactions[interactions["recipe_id"] == recipe_id].copy()

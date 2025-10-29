@@ -35,7 +35,9 @@ class UserFeatureBuilder:
         logger.info("Chargement des données...")
         # Use global cache to avoid redundant loading
         recipes = DataCache.get_recipes(path=recipes_path, optimize_dtypes=True)
-        interactions = DataCache.get_interactions(path=interactions_path, optimize_dtypes=True)
+        interactions = DataCache.get_interactions(
+            path=interactions_path, optimize_dtypes=True
+        )
 
         logger.info(f"Recettes: {len(recipes):,}")
         logger.info(f"Interactions: {len(interactions):,}")

@@ -18,8 +18,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, Tuple
 
-from src.utils.data_cache import DataCache
-
 import joblib
 import numpy as np
 import pandas as pd
@@ -32,6 +30,8 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import StratifiedKFold, cross_val_score, train_test_split
 from sklearn.preprocessing import StandardScaler
+
+from src.utils.data_cache import DataCache
 
 # Configuration du logger
 logging.basicConfig(level=logging.INFO)
