@@ -1247,19 +1247,23 @@ def show_nutrition_tagging_inference(pipeline):
 
                             with col1:
                                 calories = recipe.get('calories', 'N/A')
-                                st.metric("🔥 Calories", f"{calories:.0f}" if pd.notna(calories) else "N/A")
+                                cal_display = f"{float(calories):.0f}" if pd.notna(calories) and isinstance(calories, (int, float)) else "N/A"
+                                st.metric("🔥 Calories", cal_display)
 
                             with col2:
                                 protein = recipe.get('protein', 'N/A')
-                                st.metric("💪 Protein", f"{protein:.0f}g" if pd.notna(protein) else "N/A")
+                                prot_display = f"{float(protein):.0f}g" if pd.notna(protein) and isinstance(protein, (int, float)) else "N/A"
+                                st.metric("💪 Protein", prot_display)
 
                             with col3:
                                 fat = recipe.get('total_fat', 'N/A')
-                                st.metric("🥑 Fat", f"{fat:.0f}g" if pd.notna(fat) else "N/A")
+                                fat_display = f"{float(fat):.0f}g" if pd.notna(fat) and isinstance(fat, (int, float)) else "N/A"
+                                st.metric("🥑 Fat", fat_display)
 
                             with col4:
                                 sugar = recipe.get('sugar', 'N/A')
-                                st.metric("🍬 Sugar", f"{sugar:.0f}g" if pd.notna(sugar) else "N/A")
+                                sugar_display = f"{float(sugar):.0f}g" if pd.notna(sugar) and isinstance(sugar, (int, float)) else "N/A"
+                                st.metric("🍬 Sugar", sugar_display)
 
                             # Show predicted tags
                             st.markdown("### 🏷️ Predicted Nutrition Tags")
@@ -2597,7 +2601,8 @@ def display_recipe_card(recipe, show_predictions=True):
 
         with col4:
             calories = recipe.get('calories', 'N/A')
-            st.metric("🔥 Calories", f"{calories:.0f}" if calories != 'N/A' else 'N/A')
+            cal_display = f"{float(calories):.0f}" if calories != 'N/A' and isinstance(calories, (int, float)) else 'N/A'
+            st.metric("🔥 Calories", cal_display)
 
         # Description
         if 'description' in recipe and pd.notna(recipe['description']):
