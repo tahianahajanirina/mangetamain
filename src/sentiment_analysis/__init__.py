@@ -41,7 +41,7 @@ class SentimentAnalyzer:
         result = cls._sentiment_analyzer(text)
 
         return result[0]["label"], result[0]["score"]
-    
+
     @classmethod
     def unload_model(cls):
         """
@@ -52,4 +52,5 @@ class SentimentAnalyzer:
             del cls._sentiment_analyzer
             cls._sentiment_analyzer = None
             import gc
+
             gc.collect()
