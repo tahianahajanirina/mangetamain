@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 
 from config.config import FEATURE_CONFIG
+from src.utils.data_cache import DataCache
 
 logger = logging.getLogger(__name__)
 
@@ -35,33 +36,37 @@ class UnifiedRecipeDataLoader:
             recipes_path: Path to RAW_recipes.csv
         """
         self.recipes_path = Path(recipes_path)
-        self._recipes_cache = None
+        # Note: We rely on DataCache global cache, no local cache needed
+        self._recipes_preprocessed = None  # Cache for preprocessed data only
 
     def load_all_recipes(self, use_cache: bool = True) -> pd.DataFrame:
         """
-        Load all recipes from CSV.
+        Load all recipes from CSV with preprocessing.
 
         Args:
-            use_cache: Whether to use cached data if available
+            use_cache: Whether to use cached preprocessed data if available
 
         Returns:
-            DataFrame with all recipes
+            DataFrame with all recipes (preprocessed)
         """
-        if use_cache and self._recipes_cache is not None:
-            logger.info("Using cached recipe data")
-            return self._recipes_cache.copy()
+        # Check if we have preprocessed data cached locally
+        if use_cache and self._recipes_preprocessed is not None:
+            logger.info("Using locally cached preprocessed recipe data")
+            return self._recipes_preprocessed
 
         logger.info(f"Loading recipes from {self.recipes_path}")
-        df = pd.read_csv(self.recipes_path)
+        # Use global cache to get raw data (no redundant CSV reads)
+        df_raw = DataCache.get_recipes(path=str(self.recipes_path), optimize_dtypes=True)
 
-        # Basic preprocessing
-        df = self._preprocess_basic(df)
+        # Basic preprocessing (this creates a copy, but only once)
+        logger.info("Preprocessing recipe data...")
+        df_processed = self._preprocess_basic(df_raw)
 
-        # Cache the data
-        self._recipes_cache = df.copy()
+        # Cache the preprocessed data locally
+        self._recipes_preprocessed = df_processed
 
-        logger.info(f"Loaded {len(df)} recipes")
-        return df
+        logger.info(f"Loaded and preprocessed {len(df_processed)} recipes")
+        return df_processed
 
     def load_recipes_by_ids(self, recipe_ids: List[int]) -> pd.DataFrame:
         """
@@ -85,13 +90,16 @@ class UnifiedRecipeDataLoader:
     def _preprocess_basic(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         Basic preprocessing: convert strings to lists, extract nutrition.
+        
+        NOTE: This method creates a copy to avoid modifying the global cache.
 
         Args:
-            df: Raw dataframe
+            df: Raw dataframe from DataCache
 
         Returns:
-            Preprocessed dataframe
+            Preprocessed dataframe (new copy)
         """
+        # Create a copy to avoid modifying the global cache
         df = df.copy()
 
         # Convert string columns to lists

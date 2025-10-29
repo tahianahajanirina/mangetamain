@@ -15,6 +15,8 @@ from typing import Dict, Tuple
 import numpy as np
 import pandas as pd
 
+from src.utils.data_cache import DataCache
+
 # Configuration du logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -79,7 +81,8 @@ class NutritionClassificationFeatures:
             DataFrame avec les données chargées
         """
         logger.info(f"Chargement des données depuis {filepath}...")
-        df = pd.read_csv(filepath)
+        # Use global cache to avoid redundant loading
+        df = DataCache.get_recipes(path=str(filepath), optimize_dtypes=True)
         logger.info(f"  ✓ {len(df):,} recettes chargées")
         logger.info(f"  ✓ {df.shape[1]} colonnes")
         return df

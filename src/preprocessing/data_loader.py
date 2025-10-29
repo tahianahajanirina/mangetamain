@@ -13,6 +13,8 @@ from typing import List, Optional, Union
 import numpy as np
 import pandas as pd
 
+from src.utils.data_cache import DataCache
+
 logger = logging.getLogger(__name__)
 
 
@@ -50,7 +52,8 @@ class RecipeDataLoader:
             raise FileNotFoundError(f"Data file not found: {self.data_path}")
 
         logger.info(f"Loading data from {self.data_path}")
-        self.df = pd.read_csv(self.data_path)
+        # Use global cache to avoid redundant loading
+        self.df = DataCache.get_recipes(path=str(self.data_path), optimize_dtypes=True)
         logger.info(
             f"Loaded {len(self.df)} recipes with {len(self.df.columns)} columns"
         )

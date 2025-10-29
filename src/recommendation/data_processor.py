@@ -9,6 +9,8 @@ from pathlib import Path
 import pandas as pd
 from scipy.sparse import csr_matrix
 
+from src.utils.data_cache import DataCache
+
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
@@ -29,6 +31,9 @@ class DataProcessor:
     def load_csv_data(self, filepath, description="dataset"):
         """
         Load a CSV file with error handling.
+        
+        NOTE: This method is deprecated. Use load_data() which uses DataCache instead.
+        
         Args:
             filepath (str or Path): path to the CSV file
             description (str): descriptive name for logs/errors
@@ -37,6 +42,7 @@ class DataProcessor:
         """
         filepath = Path(filepath)
         try:
+            # Direct CSV read (not recommended, use DataCache instead)
             df = pd.read_csv(filepath)
             logging.info(
                 f"{description} loaded successfully ({filepath}): {df.shape[0]} rows"
@@ -57,8 +63,9 @@ class DataProcessor:
             recipes_path (str or Path): path to recipes file
         """
         logging.info("Loading data...")
-        self.df_interactions = self.load_csv_data(interactions_path, "Interactions")
-        self.df_recipes = self.load_csv_data(recipes_path, "Recipes")
+        # Use global cache to avoid redundant loading
+        self.df_interactions = DataCache.get_interactions(path=str(interactions_path), optimize_dtypes=True)
+        self.df_recipes = DataCache.get_recipes(path=str(recipes_path), optimize_dtypes=True)
 
         # Display basic information
         logging.info(f"Unique interactions: {len(self.df_interactions)}")
