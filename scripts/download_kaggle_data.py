@@ -23,13 +23,14 @@ from pathlib import Path
 
 # Project paths
 PROJECT_ROOT = Path(__file__).parent.parent
-DATA_RAW = PROJECT_ROOT / 'data' / 'raw'
+DATA_RAW = PROJECT_ROOT / "data" / "raw"
 
 
 def check_kaggle_setup():
     """Check if Kaggle API is properly configured."""
     try:
         import kaggle  # noqa: F401
+
         print("✓ Kaggle package found")
         return True
     except ImportError:
@@ -62,30 +63,27 @@ def download_dataset():
         # Download dataset
         print("\nDownloading dataset...")
         kaggle.api.dataset_download_files(
-            dataset,
-            path=str(DATA_RAW),
-            unzip=True,
-            quiet=False
+            dataset, path=str(DATA_RAW), unzip=True, quiet=False
         )
 
         print("\n✓ Download complete!")
 
         # List downloaded files
         print("\nDownloaded files:")
-        for file in sorted(DATA_RAW.glob('*')):
+        for file in sorted(DATA_RAW.glob("*")):
             if file.is_file():
                 size_mb = file.stat().st_size / (1024 * 1024)
                 print(f"  - {file.name} ({size_mb:.2f} MB)")
 
         # Check for expected files
         expected_files = [
-            'RAW_recipes.csv',
-            'RAW_interactions.csv',
-            'PP_recipes.csv',
-            'PP_users.csv',
-            'interactions_train.csv',
-            'interactions_validation.csv',
-            'interactions_test.csv'
+            "RAW_recipes.csv",
+            "RAW_interactions.csv",
+            "PP_recipes.csv",
+            "PP_users.csv",
+            "interactions_train.csv",
+            "interactions_validation.csv",
+            "interactions_test.csv",
         ]
 
         print("\nExpected files status:")
@@ -121,15 +119,19 @@ def main():
 
     # Check Kaggle setup
     if not check_kaggle_setup():
-        print("\n✗ Kaggle setup failed. Please install kaggle and configure API credentials.")
+        print(
+            "\n✗ Kaggle setup failed. Please install kaggle and configure API credentials."
+        )
         sys.exit(1)
 
     # Check for existing data
-    existing_files = list(DATA_RAW.glob('*.csv'))
+    existing_files = list(DATA_RAW.glob("*.csv"))
     if existing_files:
         print(f"\n⚠ Found {len(existing_files)} existing CSV files in {DATA_RAW}")
-        response = input("Do you want to download again? This will overwrite existing files. [y/N]: ")
-        if response.lower() not in ['y', 'yes']:
+        response = input(
+            "Do you want to download again? This will overwrite existing files. [y/N]: "
+        )
+        if response.lower() not in ["y", "yes"]:
             print("Download cancelled.")
             return
 
@@ -150,5 +152,5 @@ def main():
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
