@@ -29,7 +29,7 @@ DATA_RAW = PROJECT_ROOT / "data" / "raw"
 def check_kaggle_setup():
     """Check if Kaggle API is properly configured."""
     try:
-        import kaggle
+        import kaggle  # noqa: F401
 
         print("✓ Kaggle package found")
         return True

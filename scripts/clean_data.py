@@ -33,7 +33,7 @@ def safe_eval(x):
         import ast
 
         return ast.literal_eval(x)
-    except:
+    except (ValueError, SyntaxError):
         return []
 
 

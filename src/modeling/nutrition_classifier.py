@@ -257,7 +257,7 @@ class NutritionClassifier:
 
         # Prédictions
         y_pred = self.model.predict(X_test)
-        y_proba = self.model.predict_proba(X_test)
+        _ = self.model.predict_proba(X_test)
 
         # Métriques globales
         accuracy = accuracy_score(y_test, y_pred)
@@ -482,7 +482,7 @@ def main():
     classifier.train(X_train_scaled, y_train)
 
     # Évaluer
-    metrics = classifier.evaluate(X_test_scaled, y_test)
+    _ = classifier.evaluate(X_test_scaled, y_test)
 
     # Feature importance
     classifier.get_feature_importance(top_n=15)

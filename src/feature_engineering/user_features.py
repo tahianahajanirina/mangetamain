@@ -259,7 +259,7 @@ def main():
 
     # Construire les features
     builder = UserFeatureBuilder(min_interactions=5)
-    users_profiles = builder.build_features(
+    _ = builder.build_features(
         recipes_path=str(recipes_path), interactions_path=str(interactions_path)
     )
 
