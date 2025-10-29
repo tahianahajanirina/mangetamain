@@ -44,7 +44,7 @@ uv.lock
 *.ipynb_checkpoints
 
 # Data
-data/raw/*.csv
+# data/raw/*.csv
 data/processed/*.csv
 data/raw/*.pkl
 data/processed/*.pkl
@@ -52,8 +52,8 @@ data/processed/*.pkl
 !data/processed/.gitkeep
 
 # Outputs
-outputs/models/*.pkl
-outputs/models/*.json
+# outputs/models/*.pkl
+# outputs/models/*.json
 outputs/figures/*.png
 outputs/figures/*.jpg
 outputs/reports/*.txt
