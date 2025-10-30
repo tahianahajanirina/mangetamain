@@ -1,8 +1,8 @@
 """Tests for data loader module."""
 
-import pytest
 import pandas as pd
-from pathlib import Path
+import pytest
+
 from src.preprocessing.data_loader import RecipeDataLoader
 
 
@@ -70,7 +70,7 @@ class TestRecipeDataLoader:
         # Create CSV file with missing values in string columns only
         # (numeric columns with NA cause dtype issues with optimize_dtypes=True)
         csv_path = temp_data_dir["raw"] / "recipes_na.csv"
-        
+
         # Write CSV with missing values in name column only
         csv_content = """id,name,minutes
 1,Recipe 1,30

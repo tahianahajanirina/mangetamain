@@ -1,10 +1,5 @@
 """Tests for time predictor model."""
 
-import pytest
-import pandas as pd
-import numpy as np
-from src.modeling.time_predictor import train_and_evaluate_time_model
-
 
 class TestTimePredictor:
     """Test cases for time prediction model."""
@@ -13,7 +8,6 @@ class TestTimePredictor:
         """Test basic training and evaluation."""
         df = sample_recipes_with_features.copy()
 
-        feature_cols = ["n_steps", "n_ingredients", "complexity_score"]
         # Add complexity_score if not exists
         if "complexity_score" not in df.columns:
             df["complexity_score"] = df["n_steps"] * df["n_ingredients"]

@@ -1,8 +1,7 @@
 """Tests for nutrition feature engineering."""
 
 import pytest
-import pandas as pd
-import numpy as np
+
 from src.feature_engineering.nutrition_features import NutritionFeatureEngineer
 
 
@@ -54,8 +53,6 @@ class TestNutritionFeatureEngineer:
     def test_nutrition_ratios(self, sample_recipes_with_features, nutrition_engineer):
         """Test calculation of nutrition ratios."""
         # Test that method exists and can handle data with n_ingredients
-        df = sample_recipes_with_features.copy()
-
         # Just verify the method exists - full testing requires PDV columns
         assert hasattr(nutrition_engineer, "create_nutrition_ratios")
 
