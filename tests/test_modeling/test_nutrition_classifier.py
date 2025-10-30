@@ -71,7 +71,7 @@ class TestNutritionClassifier:
         y = df["is_healthy"]
 
         classifier = NutritionClassifier(model_type="random_forest")
-        
+
         # Set feature names before training
         classifier.feature_names = feature_cols
         classifier.train(X.values, y.values)
