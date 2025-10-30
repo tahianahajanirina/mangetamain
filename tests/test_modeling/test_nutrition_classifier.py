@@ -1,8 +1,5 @@
 """Tests for nutrition classifier model."""
 
-import pytest
-import pandas as pd
-import numpy as np
 from src.modeling.nutrition_classifier import NutritionClassifier
 
 
@@ -65,8 +62,8 @@ class TestNutritionClassifier:
         assert len(predictions) == len(df)
         assert all(pred in [0, 1] for pred in predictions)
 
-    def test_evaluate(self, sample_recipes_with_features):
-        """Test model evaluation."""
+    def test_get_feature_importance(self, sample_recipes_with_features):
+        """Test feature importance extraction."""
         df = sample_recipes_with_features.copy()
 
         feature_cols = ["calories", "total_fat", "sugar", "protein"]
@@ -76,12 +73,7 @@ class TestNutritionClassifier:
         classifier = NutritionClassifier(model_type="random_forest")
         classifier.train(X.values, y.values)
 
-        # Test simpler metrics without target_names
-        from sklearn.metrics import accuracy_score
-
-        # Use model.predict() directly to bypass scaler requirement
-        predictions = classifier.model.predict(X.values)
-        accuracy = accuracy_score(y.values, predictions)
-
-        assert 0 <= accuracy <= 1.0
-        assert len(predictions) == len(y)
+        # Test that feature importance can be extracted
+        importance_df = classifier.get_feature_importance(feature_names=feature_cols)
+        assert importance_df is not None
+        assert len(importance_df) > 0

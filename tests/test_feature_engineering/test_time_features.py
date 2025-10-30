@@ -1,7 +1,7 @@
 """Tests for time feature engineering."""
 
 import pytest
-import pandas as pd
+
 from src.feature_engineering.time_features import TimeFeatureEngineer
 
 
@@ -40,7 +40,7 @@ class TestTimeFeatureEngineer:
 
     def test_time_categories(self, sample_recipes_df, time_engineer):
         """Test time feature creation."""
-        df = sample_recipes_df.copy()
+        sample_recipes_df.copy()
         # Use the existing 'minutes' column
 
         # Test extract_time_from_text method

@@ -1,14 +1,14 @@
 """Tests for clean_data script."""
 
-import pytest
-import pandas as pd
-from pathlib import Path
 import sys
+from pathlib import Path
+
+import pandas as pd
 
 # Add scripts to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-from clean_data import safe_eval, clean_recipes, clean_interactions
+from clean_data import clean_interactions, clean_recipes, safe_eval
 
 
 class TestSafeEval:
