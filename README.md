@@ -1,12 +1,23 @@
-# MangeTaMain - Your Personal Recipe Discovery Platform
+# MangeTaMain - Intelligent Recipe Discovery Platform
 
-Welcome to **MangeTaMain**, an intelligent recipe discovery platform that helps you find the perfect recipes based on your taste, dietary needs, and cooking preferences!
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Streamlit](https://img.shields.io/badge/streamlit-1.50.0-FF4B4B.svg)](https://streamlit.io)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.7.2-F7931E.svg)](https://scikit-learn.org)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
----
+**MangeTaMain** is a production-ready machine learning application that transforms 230,000+ recipes and 1 million+ user reviews into personalized, actionable cooking recommendations using collaborative filtering, content-based recommendation, and deep learning.
 
-## What is MangeTaMain?
+## Overview
 
-MangeTaMain is a smart cooking companion that analyzes over 230,000 recipes and 1 million user reviews to help you discover recipes you'll love. Whether you're looking for quick weeknight dinners, healthy meals, or exploring new cuisines, MangeTaMain has you covered!
+MangeTaMain is an end-to-end ML system that combines multiple recommendation algorithms, predictive models, and natural language processing to deliver an intelligent recipe discovery experience. Built with scikit-learn, PyTorch, Transformers, and Streamlit, it provides:
+
+- **Collaborative Filtering**: SVD-based user recommendations analyzing millions of interactions
+- **Content-Based Recommendations**: Recipe similarity using clustering (HDBSCAN) and feature engineering
+- **Time Prediction**: Multi-model regression for accurate cooking time estimates
+- **Nutrition Classification**: Multi-label binary classifiers for health tagging
+- **Sentiment Analysis**: Transformer-based review analysis (DistilBERT/RoBERTa)
+- **RAG Chatbot**: Google Gemini-powered conversational recipe assistant
+- **Interactive UI**: Streamlit web application with real-time predictions
 
 ### Key Features
 
@@ -17,14 +28,83 @@ MangeTaMain is a smart cooking companion that analyzes over 230,000 recipes and 
 - **Recipe Categories**: Browse recipes organized by cooking time, complexity, and health profile
 - **User Reviews Analysis**: See what other home cooks think about recipes
 
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [For Users](#for-users)
+  - [How to Use](#how-to-use-mangetamain)
+  - [Understanding Results](#understanding-your-results)
+  - [Tips & Best Practices](#tips-for-best-results)
+- [For Developers](#for-developers)
+  - [Project Structure](#project-structure)
+  - [Technology Stack](#technology-stack)
+  - [Development Setup](#development-setup)
+  - [Running Tests](#running-tests)
+  - [CI/CD Pipeline](#cicd-pipeline)
+- [Dataset Information](#dataset-information)
+- [Contributing](#contributing)
+- [License](#license)
+
 ---
 
-## Getting Started
+## Quick Start
+
+### Prerequisites
+
+- Python 3.9 or higher
+- 4GB RAM minimum (8GB recommended)
+- Git
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/[your-organization]/mangetamain.git
+cd mangetamain
+
+# Install dependencies using make
+make install
+
+# Or manually with pip
+pip install -r requirements.txt
+
+# Download the dataset (requires Kaggle API credentials)
+make download-data
+
+# Or manually download from Kaggle and place in data/raw/
+# https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions
+```
+
+### Run the Application
+
+```bash
+# Launch the Streamlit web app
+streamlit run streamlit_app_final.py
+
+# Or using make
+make app
+```
+
+The application will open in your browser at `http://localhost:8501`
+
+### Using Docker
+
+```bash
+# Build and run with Docker Compose
+make docker-up
+
+# Or manually
+docker-compose up -d
+```
+
+---
+
+## For Users
 
 ### Installation Requirements
 
 Before you begin, make sure you have:
-- Python 3.8 or higher installed on your computer
+- Python 3.9 or higher installed on your computer
 - Basic familiarity with running commands in a terminal
 
 ### Step 1: Download the Project
@@ -254,22 +334,333 @@ A: This feature is planned for future releases. Currently, note down Recipe IDs 
 
 ---
 
-## Project Structure
+## For Developers
+
+### Project Structure
 
 ```
 mangetamain/
-├── data/                       # Recipe and user data
-│   ├── RAW_recipes.csv        # All recipe information
-│   └── RAW_interactions.csv   # User ratings and reviews
-├── src/                       # Application source code
-│   ├── integration/           # Core recommendation system
-│   ├── modeling/              # Prediction and analysis
-│   └── sentiment_analysis/    # Review analysis
-├── outputs/                   # Saved results
-├── streamlit_app_final.py    # Main application
-├── requirements.txt          # Python dependencies
-└── README.md                 # This guide
+├── .devcontainer/              # VS Code Dev Container configuration
+├── .github/
+│   └── workflows/              # GitHub Actions CI/CD pipelines
+│       ├── ci.yml              # Main CI pipeline (test, lint, coverage)
+│       ├── ml-pipeline.yml     # ML training pipeline
+│       └── docker.yml          # Docker build and publish
+├── config/
+│   └── config.py               # Central configuration (paths, hyperparameters, thresholds)
+├── data/
+│   ├── raw/                    # Raw CSV files from Kaggle
+│   │   ├── RAW_recipes.csv     # 230K+ recipes
+│   │   └── RAW_interactions.csv # 1M+ user reviews
+│   └── processed/              # Cleaned and preprocessed data
+├── outputs/
+│   ├── figures/                # EDA visualizations
+│   ├── models/                 # Trained ML models (.pkl files)
+│   ├── reports/                # Analysis reports
+│   └── sentiment_model/        # Sentiment analysis model checkpoints
+├── src/
+│   ├── chatbot/                # RAG chatbot (Gemini integration)
+│   │   └── rag_chatbot.py
+│   ├── eda/                    # Exploratory data analysis
+│   │   └── visualization.py
+│   ├── feature_engineering/    # Feature generation modules
+│   │   ├── nutrition_features.py
+│   │   ├── recipe_features.py
+│   │   ├── time_features.py
+│   │   └── user_features.py
+│   ├── integration/            # Unified recommendation pipeline
+│   │   ├── recommendation_pipeline.py
+│   │   └── unified_data_loader.py
+│   ├── modeling/               # ML models
+│   │   ├── nutrition_classifier.py    # Multi-class classification
+│   │   ├── nutrition_tagger.py        # Multi-label binary classification
+│   │   ├── recipe_clustering.py       # HDBSCAN clustering
+│   │   ├── time_predictor.py          # Regression models
+│   │   └── user_clustering.py         # User segmentation
+│   ├── preprocessing/          # Data loading and cleaning
+│   │   └── data_loader.py
+│   ├── recommendation/         # Recommendation algorithms
+│   │   ├── svd_recommender.py         # Collaborative filtering
+│   │   ├── recipe_recommender.py      # Content-based
+│   │   └── data_processor.py
+│   ├── sentiment_analysis/     # Review sentiment models
+│   └── utils/                  # Utility functions
+│       └── data_cache.py       # Memory-efficient data caching
+├── tests/                      # Test suite (pytest)
+│   ├── conftest.py             # Shared fixtures
+│   ├── test_feature_engineering/
+│   ├── test_modeling/
+│   └── test_scripts/
+├── scripts/                    # Automation scripts
+│   ├── download_kaggle_data.py
+│   ├── clean_data.py
+│   ├── run_recipe_pipeline.py
+│   ├── run_nutrition_pipeline.py
+│   └── train_sentiment_model.py
+├── streamlit_app_final.py      # Main Streamlit application (2700 lines)
+├── main_nutrition_tagging.py   # Nutrition pipeline orchestrator
+├── main_time_prediction.py     # Time prediction pipeline
+├── train_sentiment_model.py    # Sentiment model training
+├── Dockerfile                  # Docker image configuration
+├── docker-compose.yml          # Multi-container orchestration
+├── Makefile                    # Build automation commands
+├── pyproject.toml              # Project metadata, dependencies, tool configs
+├── requirements.txt            # Pinned dependencies (UV compiled)
+└── README.md                   # This file
 ```
+
+**Project Statistics:**
+- **60 Python files** | **13,689 lines of code** | **5.9 MB total**
+- **Main app**: 2,700 lines (streamlit_app_final.py)
+- **30 source modules** | **13 test modules** | **4 CI/CD workflows**
+
+### Technology Stack
+
+#### Machine Learning & Data Science
+- **scikit-learn 1.7.2** - ML algorithms (Random Forest, Gradient Boosting, SVD)
+- **pandas 2.3.3** - Data manipulation (230K+ recipes, 1M+ reviews)
+- **numpy 2.3.4** - Numerical computing
+- **scipy 1.16.3** - Scientific computing and optimization
+- **joblib 1.5.2** - Model serialization and parallel processing
+
+#### Deep Learning & NLP
+- **PyTorch 2.9.0** - Deep learning framework
+- **transformers 4.57.1** - Pre-trained models (DistilBERT, RoBERTa)
+- **huggingface-hub 0.36.0** - Model hub integration
+- **nltk 3.9.2** - Natural language processing
+- **textblob 0.19.0** - Sentiment analysis utilities
+- **textstat 0.7.10** - Text complexity analysis
+
+#### Web Framework
+- **Streamlit 1.50.0** - Interactive web application
+- **plotly 6.3.1** - Interactive visualizations
+- **matplotlib 3.10.7** - Static plots
+- **seaborn 0.13.2** - Statistical visualization
+
+#### AI/LLM
+- **google-generativeai 0.8.5** - Google Gemini API for RAG chatbot
+
+#### Clustering
+- **hdbscan 0.8.40** - Hierarchical density-based clustering
+
+#### Development & Testing
+- **pytest 7.3.0+** - Testing framework with fixtures
+- **pytest-cov** - Coverage reporting
+- **black 23.0.0** - Code formatting (88-char line length)
+- **ruff 0.1.0+** - Fast Python linter
+- **jupyter** - Interactive notebooks for experimentation
+
+#### DevOps
+- **Docker** - Containerization (multi-stage builds)
+- **GitHub Actions** - CI/CD automation (4 workflows)
+- **make** - Build automation (12+ commands)
+
+### Development Setup
+
+#### 1. Clone and Install
+
+```bash
+git clone https://github.com/[your-organization]/mangetamain.git
+cd mangetamain
+
+# Install all dependencies including dev tools
+make install-dev
+
+# Or manually
+pip install -e ".[dev]"
+```
+
+#### 2. Configure Environment
+
+```bash
+# Set up Kaggle API credentials (for data download)
+export KAGGLE_USERNAME="your-username"
+export KAGGLE_KEY="your-api-key"
+
+# Or create ~/.kaggle/kaggle.json
+mkdir -p ~/.kaggle
+echo '{"username":"your-username","key":"your-api-key"}' > ~/.kaggle/kaggle.json
+chmod 600 ~/.kaggle/kaggle.json
+```
+
+#### 3. Download Data
+
+```bash
+# Using make
+make download-data
+
+# Or manually
+python scripts/download_kaggle_data.py
+```
+
+#### 4. Run Data Pipeline
+
+```bash
+# Clean and preprocess data
+make clean-data
+
+# Run full ML pipeline
+make pipeline
+
+# Or run individual pipelines
+python main_time_prediction.py
+python main_nutrition_tagging.py
+python train_sentiment_model.py
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+make test
+
+# Run with coverage report
+make test-cov
+
+# Run specific test file
+pytest tests/test_modeling/test_time_predictor.py
+
+# Run with verbose output
+pytest -v
+
+# Run only fast tests (skip slow/integration)
+pytest -m "not slow"
+```
+
+**Test Coverage:** The project includes comprehensive unit tests covering:
+- Data loading and preprocessing
+- Feature engineering (nutrition, time, recipe, user)
+- Model training and prediction
+- Clustering algorithms
+- Data cleaning utilities
+
+**Test Fixtures:** 6 shared fixtures in `tests/conftest.py`:
+- `sample_recipes_df` - 5 sample recipes
+- `sample_interactions_df` - User interaction data
+- `sample_recipes_with_features` - Pre-engineered features
+- `temp_data_dir` - Temporary directory structure
+- `temp_output_dir` - Temporary output structure
+
+### Code Quality
+
+```bash
+# Format code with Black (88-char line length)
+make format
+
+# Lint with Ruff
+make lint
+
+# Run both
+make format && make lint
+```
+
+**Code Style:**
+- **Black** formatting (88-char lines, Python 3.9+)
+- **Ruff** linting (fast, enforces best practices)
+- Type hints encouraged (not enforced)
+- Docstrings for public APIs (Google style)
+
+### CI/CD Pipeline
+
+The project uses GitHub Actions for continuous integration and deployment:
+
+#### 1. CI Workflow (`ci.yml`)
+**Triggers:** Push/PR on main and develop branches
+**Python Versions:** 3.9, 3.10, 3.11
+**Steps:**
+1. Install dependencies with caching
+2. Lint with ruff and black
+3. Run pytest with coverage
+4. Upload coverage to Codecov
+5. Generate HTML coverage reports
+
+#### 2. ML Pipeline Workflow (`ml-pipeline.yml`)
+**Triggers:** Manual dispatch, Sunday 2 AM cron, push to main
+**Steps:**
+1. Setup Kaggle credentials from secrets
+2. Download dataset (optional)
+3. Clean data
+4. Run recipe pipeline (clustering, features)
+5. Run nutrition pipeline (classification)
+6. Run time prediction (regression)
+7. Train sentiment model (transformers)
+8. Archive model artifacts (30-day retention)
+
+**Secrets Required:**
+- `KAGGLE_USERNAME`
+- `KAGGLE_KEY`
+
+#### 3. Docker Workflow (`docker.yml`)
+**Triggers:** Push to main, version tags (`v*`), PRs (test only)
+**Steps:**
+1. Build Docker image
+2. Run container validation tests
+3. Push to GitHub Container Registry
+4. Tag with `latest`, version, and git SHA
+
+### Available Make Commands
+
+```bash
+make install          # Install dependencies
+make install-dev     # Install with dev tools
+make test            # Run tests
+make test-cov        # Run tests with coverage
+make lint            # Lint code with ruff
+make format          # Format code with black
+make pipeline        # Run full ML pipeline
+make docker-build    # Build Docker image
+make docker-up       # Start Docker containers
+make docker-down     # Stop Docker containers
+make download-data   # Download Kaggle dataset
+make clean-data      # Run data cleaning script
+make app             # Run Streamlit application
+make help            # Show all available commands
+```
+
+### Memory Optimization
+
+The application includes advanced memory management for deployment on limited resources (e.g., Streamlit Cloud with 1GB RAM):
+
+**DataCache System:**
+- Singleton-pattern caching to load large CSVs only once
+- Selective column loading (load only needed columns)
+- Type optimization (reduce datatype sizes)
+- Garbage collection and strategic unloading
+
+**Streamlit Cloud Mode:**
+- Aggressive memory mode when RAM < 2GB
+- Selective dataframe unloading between pages
+- Recipe data cached (used by 75% of pages)
+- Sentiment model unloaded after use
+
+See `src/utils/data_cache.py` and `test_memory_optimization.py` for implementation details.
+
+---
+
+## Contributing
+
+We welcome contributions from the community! Here's how you can help:
+
+### How to Contribute
+
+1. **Fork the repository** on GitHub
+2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
+3. **Make your changes** following our code style guidelines
+4. **Add tests** for any new functionality
+5. **Run the test suite** (`make test`) to ensure everything passes
+6. **Format and lint** your code (`make format && make lint`)
+7. **Commit your changes** (`git commit -m 'Add amazing feature'`)
+8. **Push to your fork** (`git push origin feature/amazing-feature`)
+9. **Open a Pull Request** with a clear description
+
+### Contribution Guidelines
+
+- Follow the existing code style (Black + Ruff)
+- Write clear, descriptive commit messages
+- Add unit tests for new features
+- Update documentation as needed
+- Keep PRs focused on a single feature/fix
+- Ensure all tests pass before submitting
 
 ---
 
@@ -277,45 +668,92 @@ mangetamain/
 
 Having issues or suggestions? Here's how to get help:
 
-1. **Check this guide**: Most common questions are answered here
-2. **Review error messages**: They often point to the solution
-3. **Open an issue**: Report bugs or request features on GitHub
-4. **Contact the team**: Reach out to the project maintainers
+- **Issues**: Report bugs or request features on [GitHub Issues](https://github.com/[your-organization]/mangetamain/issues)
+- **Discussions**: Ask questions in [GitHub Discussions](https://github.com/[your-organization]/mangetamain/discussions)
+- **Check README**: Most common questions are answered in this guide
 
 ---
 
-## What's Next?
+## Roadmap
 
-MangeTaMain is continuously improving! Planned features include:
+Planned features and improvements:
 
-- User account creation
-- Personal recipe collections
-- Shopping list generation
-- Meal planning calendar
-- Social sharing features
-- Mobile app version
+**Version 3.0 (Q2 2025)**
+- User account creation and authentication
+- Personal recipe collections and favorites
+- Shopping list generation with ingredient aggregation
+- Meal planning calendar with weekly views
+
+**Version 3.5 (Q3 2025)**
+- Social features (sharing, following, recipe discussions)
+- Recipe rating and review submission
+- Advanced filters (cuisine type, dietary restrictions)
+- Recipe scaling (adjust servings)
+
+**Version 4.0 (Q4 2025)**
+- Mobile app (iOS/Android) with React Native
+- Voice-activated cooking assistant
+- Ingredient substitution suggestions
+- Cooking mode with step-by-step timer
+
+**Future Considerations**
+- Integration with grocery delivery services
+- Nutrition tracking and meal analytics
+- Community recipe submissions
+- Video cooking tutorials integration
 
 ---
 
-## Credits
+## Acknowledgments
 
-MangeTaMain is built on:
-- **Dataset**: Food.com Recipes and Interactions (Kaggle)
-- **Technology**: Python, Streamlit, and open-source tools
-- **Community**: Contributions from home cooks and developers
+MangeTaMain is built on the shoulders of giants:
 
----
-
-## License and Terms
-
-This project is for educational and personal use. Recipe data is courtesy of Food.com and Kaggle.
+- **Dataset**: [Food.com Recipes and Interactions](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions) by Shuyang Li (Kaggle)
+- **Technology**: Built with Python, scikit-learn, PyTorch, Transformers, Streamlit, and many other open-source libraries
+- **Inspiration**: Powered by the passion of home cooks and data science enthusiasts
+- **Community**: Special thanks to all contributors and testers
 
 ---
 
-**Last Updated**: 2025-10-28
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+**Dataset License**: The Food.com dataset is subject to Kaggle's terms of use. Please review the [dataset page](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions) for specific licensing information.
+
+---
+
+## Citation
+
+If you use MangeTaMain in your research or project, please cite:
+
+```bibtex
+@software{mangetamain2025,
+  title = {MangeTaMain: Intelligent Recipe Discovery Platform},
+  author = {[Your Name/Organization]},
+  year = {2025},
+  url = {https://github.com/[your-organization]/mangetamain},
+  version = {2.0.0}
+}
+```
+
+---
+
+## Project Statistics
+
+- **230,000+ recipes** from Food.com
+- **1,000,000+ user reviews** spanning 18 years (2000-2018)
+- **13,689 lines of Python code** across 60 files
+- **30 source modules** | **13 test modules** | **4 CI/CD workflows**
+- **2,700-line Streamlit application** for interactive exploration
+- **6 machine learning models** (collaborative filtering, time prediction, nutrition classification, sentiment analysis, clustering)
+
+---
 
 **Version**: 2.0.0
+**Last Updated**: 2025-10-31
+**Status**: Production Ready
 
 ---
 
-Enjoy cooking with MangeTaMain! Happy cooking! 👨‍🍳👩‍🍳
+**Built with passion by data scientists and home cooks who believe that great food and great technology go hand in hand.**
