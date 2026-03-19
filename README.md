@@ -66,63 +66,9 @@ Le système combine **6 approches de Machine Learning** distinctes :
 
 ## 🏗️ Architecture
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                         DONNÉES BRUTES                           │
-│         Food.com : 230K recettes + 1M interactions               │
-└───────────────────────────┬──────────────────────────────────────┘
-                            │
-                            ▼
-            ┌───────────────────────────────┐
-            │     CHARGEMENT & CACHE        │
-            │   DataCache (Singleton)       │
-            │   Chargement sélectif         │
-            │   Optimisation mémoire        │
-            └───────────────┬───────────────┘
-                            │
-              ┌─────────────┴──────────────┐
-              │                            │
-              ▼                            ▼
-┌──────────────────────┐     ┌──────────────────────────┐
-│ FEATURE ENGINEERING  │     │    PRÉTRAITEMENT         │
-│ • Time features      │     │ • Conversion de types    │
-│ • Nutrition features │     │ • Valeurs manquantes     │
-│ • Recipe features    │     │ • Filtrage qualité       │
-│ • User features      │     │ • safe_eval() pour listes│
-└──────────┬───────────┘     └──────────┬───────────────┘
-           │                            │
-           └──────────┬─────────────────┘
-                      │
-    ┌─────────────────┼──────────────────────┐
-    │                 │                      │
-    ▼                 ▼                      ▼
-┌──────────┐   ┌────────────┐   ┌────────────────────┐
-│ MODÈLES  │   │ RECOMMAND. │   │ NLP & CHATBOT      │
-│ ML       │   │            │   │                    │
-│ • K-Means│   │ • SVD      │   │ • Sentiment        │
-│ • RF/GB  │   │ • Content  │   │   (Transformers)   │
-│ • Ridge  │   │ • Hybrid   │   │ • RAG Chatbot      │
-│          │   │            │   │   (Gemini API)     │
-└────┬─────┘   └─────┬──────┘   └─────────┬──────────┘
-     │               │                    │
-     └───────────────┼────────────────────┘
-                     │
-                     ▼
-      ┌──────────────────────────────┐
-      │    PIPELINE INTÉGRÉ          │
-      │  Composition des modèles     │
-      │  Stratégies de fallback      │
-      │  Cache & performance         │
-      └──────────────┬───────────────┘
-                     │
-                     ▼
-      ┌──────────────────────────────┐
-      │   APPLICATION STREAMLIT      │
-      │   8 pages interactives       │
-      │   Visualisations Plotly      │
-      │   Optimisé cloud (1GB RAM)   │
-      └──────────────────────────────┘
-```
+<div align="center">
+  <img src="docs/architecture.png" alt="Architecture MangetaMain" width="80%" />
+</div>
 
 ---
 
