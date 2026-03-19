@@ -1,19 +1,22 @@
 <div align="center">
-
-# 🍽️ MangetaMain
-
-**Plateforme ML complète pour recommander des recettes personnalisées**
-
-[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.4.2-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.35.0-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![HuggingFace](https://img.shields.io/badge/HuggingFace-Transformers-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/)
-[![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)](https://pandas.pydata.org/)
-[![Surprise](https://img.shields.io/badge/Surprise-SVD%20Recommender-FF6B6B?style=for-the-badge&logoColor=white)](http://surpriselib.com/)
-[![Gemini](https://img.shields.io/badge/Google-Gemini_API-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
-[![Tests](https://img.shields.io/badge/Tests-124_passed-brightgreen?style=for-the-badge&logo=pytest&logoColor=white)](tests/)
-
+  <h1>🍽️ MangetaMain — Recommandation de Recettes par Machine Learning</h1>
+  <p><b>Plateforme ML complète pour recommander des recettes personnalisées.</b></p>
+  <p>
+    <img src="https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+    <img src="https://img.shields.io/badge/scikit--learn-1.4.2-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="scikit-learn">
+    <img src="https://img.shields.io/badge/Streamlit-1.35.0-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit">
+    <img src="https://img.shields.io/badge/HuggingFace-Transformers-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black" alt="HuggingFace">
+    <img src="https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white" alt="Pandas">
+    <img src="https://img.shields.io/badge/Surprise-SVD%20Recommender-FF6B6B?style=for-the-badge&logoColor=white" alt="Surprise">
+    <img src="https://img.shields.io/badge/Google-Gemini_API-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini">
+    <img src="https://img.shields.io/badge/Tests-124_passed-brightgreen?style=for-the-badge&logo=pytest&logoColor=white" alt="Tests">
+  </p>
 </div>
+
+<br>
+
+> **Projet réalisé par [Tahiana Hajanirina Andriambahoaka](https://github.com/tahianahajanirina), [Ahmed Fakhfakh](https://github.com/Ahmedfekhfakh), [Antoine Le Fèvre](https://github.com/A-Le-F) et [Oussama Rhouma](https://github.com/oussama10rhouma)**
+> dans le cadre du cours *DATA706 — Bases de Données et Analyse* à Télécom Paris · Institut Polytechnique de Paris · Octobre 2025
 
 ---
 
