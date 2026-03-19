@@ -4,6 +4,7 @@ This module contains all configuration parameters for data paths,
 model hyperparameters, and feature engineering settings.
 """
 
+import os
 from pathlib import Path
 
 # Project paths
@@ -17,9 +18,6 @@ FIGURE_DIR = OUTPUT_DIR / "figures"
 OUTPUTS_FIGURES = FIGURE_DIR  # Alias for compatibility
 REPORT_DIR = OUTPUT_DIR / "reports"
 
-DATA_RAW = DATA_DIR / "raw"
-DATA_PROCESSED = DATA_DIR / "processed"
-OUTPUTS_FIGURES = FIGURE_DIR
 
 # Data files
 RAW_DATA_FILE = DATA_RAW / "RAW_recipes.csv"
@@ -216,7 +214,7 @@ MODEL_CONFIG = {
 CHATBOT_CONFIG = {
     # To use the chatbot, add your Google Gemini API key here
     # Get your API key from: https://makersuite.google.com/app/apikey
-    "gemini_api_key": "AIzaSyDpyn8VOKAWqik7nWSMmxSsX9PTsT5wZQw",  # Add your API key here or set via environment variable GEMINI_API_KEY
+    "gemini_api_key": os.environ.get("GEMINI_API_KEY", ""),  # Set via environment variable GEMINI_API_KEY
     "model": "gemini-2.0-flash-exp",
     "max_history": 10,
     "retrieval_top_k": 5,

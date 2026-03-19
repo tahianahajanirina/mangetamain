@@ -12,7 +12,7 @@ from scipy.sparse.linalg import svds
 
 from src.recommendation.data_processor import DataProcessor
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logger = logging.getLogger(__name__)
 
 
 class SVDRecommender:
@@ -50,12 +50,12 @@ class SVDRecommender:
 
         try:
             self.U, self.S, self.Vt = svds(self.data_processor.sparse_matrix, k=k)
-            logging.info(
+            logger.info(
                 f"SVD computed with k={k}. Dimensions U: {self.U.shape}, S: {self.S.shape}, Vt: {self.Vt.shape}"
             )
             self.is_fitted = True
         except Exception as e:
-            logging.error(f"Error during SVD computation: {e}")
+            logger.error(f"Error during SVD computation: {e}")
             raise
 
     def predict_user_ratings(self, user_idx):
@@ -107,7 +107,7 @@ class SVDRecommender:
             ]
 
             if not non_rated_indices:
-                logging.warning(f"No new recipes to recommend for user {user_id}")
+                logger.warning(f"No new recipes to recommend for user {user_id}")
                 return self.data_processor.get_recipe_names([])
 
             # Predictions on unrated recipes
@@ -121,7 +121,7 @@ class SVDRecommender:
             return top_rec_names.reset_index(drop=True)
 
         except Exception as e:
-            logging.error(f"Error generating SVD recommendations: {e}")
+            logger.error(f"Error generating SVD recommendations: {e}")
             raise
 
     def fit(self, interactions_path, recipes_path, k=50):
@@ -132,10 +132,10 @@ class SVDRecommender:
             recipes_path (str or Path): path to recipes file
             k (int): number of SVD dimensions
         """
-        logging.info(f"Training SVD recommendation model with k={k}")
+        logger.info(f"Training SVD recommendation model with k={k}")
         self.load_and_prepare_data(interactions_path, recipes_path)
         self.compute_svd(k=k)
-        logging.info("Model training completed successfully")
+        logger.info("Model training completed successfully")
 
     def recommend_for_user(self, user_real_id, top_n=10, min_historical_threshold=5):
         """
@@ -151,7 +151,7 @@ class SVDRecommender:
         if not self.is_fitted:
             raise ValueError("Model must be fitted first")
 
-        logging.info(f"Generating {top_n} recommendations for user {user_real_id}")
+        logger.info(f"Generating {top_n} recommendations for user {user_real_id}")
 
         # Try to find user
         try:
@@ -160,7 +160,7 @@ class SVDRecommender:
             )
             user_found = True
         except ValueError:
-            logging.warning(
+            logger.warning(
                 f"User {user_real_id} not found, will use global recommendations"
             )
             confirmed_user_id = user_real_id
@@ -171,13 +171,13 @@ class SVDRecommender:
             interaction_count = self.data_processor.get_user_interaction_count(
                 confirmed_user_id
             )
-            logging.info(
+            logger.info(
                 f"User {confirmed_user_id} has {interaction_count} historical interactions"
             )
 
             if interaction_count >= min_historical_threshold:
                 # Sufficient data: use personalized recommendations
-                logging.info("Using personalized SVD recommendations")
+                logger.info("Using personalized SVD recommendations")
 
                 # Historical recommendations
                 historical = self.data_processor.get_user_historical_recipes(
@@ -198,10 +198,10 @@ class SVDRecommender:
                 }
             else:
                 # Insufficient data: use global popular recipes
-                logging.warning(
+                logger.warning(
                     f"User has only {interaction_count} interactions (< {min_historical_threshold})"
                 )
-                logging.info("Using global popular recommendations as fallback")
+                logger.info("Using global popular recommendations as fallback")
 
                 # Get user's limited historical data
                 historical = self.data_processor.get_user_historical_recipes(
@@ -222,7 +222,7 @@ class SVDRecommender:
                 }
         else:
             # User not found: use global recommendations
-            logging.info("User not found, using global popular recommendations")
+            logger.info("User not found, using global popular recommendations")
 
             # No historical data
             historical = pd.DataFrame(columns=["id", "name", "rating"])
@@ -252,42 +252,42 @@ def main():
     recipes_path = script_dir.parent / "RAW_recipes.csv"
 
     # Create and train the recommendation system
-    logging.info("Starting recommendation system demo")
+    logger.info("Starting recommendation system demo")
     recommender = SVDRecommender()
     recommender.fit(raw_interactions_path, recipes_path, k=10)  # Smaller k for demo
 
     # Test different types of users
-    logging.info("=" * 60)
-    logging.info("TESTING RECOMMENDATION SYSTEM WITH FALLBACK")
-    logging.info("=" * 60)
+    logger.info("=" * 60)
+    logger.info("TESTING RECOMMENDATION SYSTEM WITH FALLBACK")
+    logger.info("=" * 60)
 
     # Test 1: Rich user
-    logging.info("1. Testing user with rich history:")
+    logger.info("1. Testing user with rich history:")
     result1 = recommender.recommend_for_user(
         52282, top_n=10, min_historical_threshold=5
     )
-    logging.info(
+    logger.info(
         f"   Result: {result1['recommendation_type']}, Fallback: {result1['fallback_used']}"
     )
 
     # Test 2: User with limited history
-    logging.info("2. Testing user with limited history:")
+    logger.info("2. Testing user with limited history:")
     result2 = recommender.recommend_for_user(
         52282, top_n=10, min_historical_threshold=1000
     )  # High threshold
-    logging.info(
+    logger.info(
         f"   Result: {result2['recommendation_type']}, Fallback: {result2['fallback_used']}"
     )
 
     # Test 3: Non-existent user
-    logging.info("3. Testing non-existent user:")
+    logger.info("3. Testing non-existent user:")
     result3 = recommender.recommend_for_user(999999999, top_n=10)
-    logging.info(
+    logger.info(
         f"   Result: {result3['recommendation_type']}, Fallback: {result3['fallback_used']}"
     )
 
-    logging.info("=" * 60)
-    logging.info("Demo completed successfully")
+    logger.info("=" * 60)
+    logger.info("Demo completed successfully")
 
 
 if __name__ == "__main__":

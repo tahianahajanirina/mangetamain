@@ -1,6 +1,6 @@
 # Makefile for Recipe ML Project
 
-.PHONY: help install install-dev test test-cov lint format clean docker-build docker-up download-data pipeline
+.PHONY: help install install-dev test test-cov lint format clean docker-build docker-up docker-down download-data pipeline app
 
 help:
 	@echo "Available commands:"
@@ -52,6 +52,9 @@ pipeline: download-data
 	python main_nutrition_tagging.py
 	python main_time_prediction.py
 	python train_sentiment_model.py
+
+app:
+	streamlit run streamlit_app_final.py
 
 docker-build:
 	docker build -t recipe-ml:latest .

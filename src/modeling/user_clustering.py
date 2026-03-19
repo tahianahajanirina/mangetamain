@@ -23,7 +23,6 @@ from sklearn.metrics import (
 )
 from sklearn.preprocessing import StandardScaler
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 sns.set_style("whitegrid")
@@ -555,14 +554,14 @@ def main():
 
     # Afficher les stats
     stats = clusterer.get_stats()
-    print("\n" + "=" * 80)
-    print("STATISTIQUES FINALES")
-    print("=" * 80)
-    print(f"Clusters: {stats['n_clusters']}")
-    print(f"Utilisateurs: {stats['n_users']:,}")
-    print(f"Silhouette: {stats['silhouette']:.4f}")
-    print(f"Inertia: {stats['inertia']:,.2f}")
-    print(f"\nModèle sauvegardé: {model_name}")
+    logger.info("=" * 80)
+    logger.info("STATISTIQUES FINALES")
+    logger.info("=" * 80)
+    logger.info(f"Clusters: {stats['n_clusters']}")
+    logger.info(f"Utilisateurs: {stats['n_users']:,}")
+    logger.info(f"Silhouette: {stats['silhouette']:.4f}")
+    logger.info(f"Inertia: {stats['inertia']:,.2f}")
+    logger.info(f"Modèle sauvegardé: {model_name}")
 
 
 if __name__ == "__main__":

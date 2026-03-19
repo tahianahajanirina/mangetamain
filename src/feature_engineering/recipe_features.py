@@ -14,7 +14,6 @@ import pandas as pd
 
 from src.utils.data_cache import DataCache
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -244,7 +243,7 @@ def main():
         min_rating=3.5,
     )
 
-    print(f"\n✓ Features créées: {len(recipes_features):,} recettes")
+    logger.info(f"Features créées: {len(recipes_features):,} recettes")
 
 
 if __name__ == "__main__":

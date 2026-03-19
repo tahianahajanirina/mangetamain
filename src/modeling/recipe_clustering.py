@@ -21,7 +21,6 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 sns.set_style("whitegrid")
@@ -625,13 +624,13 @@ def main():
 
     # Afficher les stats
     stats = clusterer.get_stats()
-    print("\n" + "=" * 80)
-    print("STATISTIQUES FINALES")
-    print("=" * 80)
-    print(f"Clusters: {stats['n_clusters']}")
-    print(f"Recettes: {stats['n_recipes']:,}")
-    print(f"Silhouette: {stats['silhouette']:.4f}")
-    print(f"Inertia: {stats['inertia']:,.2f}")
+    logger.info("=" * 80)
+    logger.info("STATISTIQUES FINALES")
+    logger.info("=" * 80)
+    logger.info(f"Clusters: {stats['n_clusters']}")
+    logger.info(f"Recettes: {stats['n_recipes']:,}")
+    logger.info(f"Silhouette: {stats['silhouette']:.4f}")
+    logger.info(f"Inertia: {stats['inertia']:,.2f}")
 
 
 if __name__ == "__main__":
