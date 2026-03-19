@@ -38,22 +38,13 @@ Le système combine **6 approches de Machine Learning** distinctes :
 ## 🖼️ Aperçu
 
 <div align="center">
+  <img src="docs/screenshots/app-home.png" alt="MangetaMain Home" width="100%" />
+  <p><em>Page d'accueil — Quick Start Guide, statut du système, menu de navigation</em></p>
+</div>
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                  🍽️ MangetaMain — Interface Streamlit        │
-│                                                             │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐      │
-│  │ Recos    │ │ Nutrition│ │ Sentiment│ │ Chatbot  │      │
-│  │ SVD      │ │ Tags     │ │ Avis     │ │ RAG      │      │
-│  └──────────┘ └──────────┘ └──────────┘ └──────────┘      │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐      │
-│  │ Clusters │ │ Temps    │ │ EDA      │ │ Similaire│      │
-│  │ K-Means  │ │ Predict  │ │ Insights │ │ Content  │      │
-│  └──────────┘ └──────────┘ └──────────┘ └──────────┘      │
-└─────────────────────────────────────────────────────────────┘
-```
-
+<div align="center">
+  <img src="docs/screenshots/find-recipes.png" alt="Find Recipes" width="100%" />
+  <p><em>Recommandation personnalisée — User ID, filtres optionnels, suggestions SVD</em></p>
 </div>
 
 ---
