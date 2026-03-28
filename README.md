@@ -1,4 +1,5 @@
 <div align="center">
+  <img src="docs/screenshots/hero.jpg" alt="MangetaMain" width="80%" style="border-radius:12px; margin-bottom:16px"/>
   <h1>🍽️ MangetaMain — Recommandation de Recettes par Machine Learning</h1>
   <p><b>Plateforme ML complète pour recommander des recettes personnalisées.</b></p>
   <p>
