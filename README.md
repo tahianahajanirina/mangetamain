@@ -68,7 +68,7 @@ Le système combine **6 approches de Machine Learning** distinctes :
 ## 🏗️ Architecture
 
 <div align="center">
-  <img src="docs/architecture.png" alt="Architecture MangetaMain" width="80%" />
+  <a href="https://raw.githubusercontent.com/tahianahajanirina/mangetamain/develop/docs/diagrams/architecture.svg"><img src="docs/diagrams/architecture.svg" alt="Architecture MangetaMain" width="90%"/></a>
 </div>
 
 ---
