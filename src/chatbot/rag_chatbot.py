@@ -1,5 +1,5 @@
 """
-Simple RAG Chatbot using Google Gemini Flash 2.5
+Simple RAG Chatbot using Google Gemini 2.0 Flash
 
 This module provides a straightforward RAG (Retrieval Augmented Generation) chatbot
 that can answer questions about recipes using Google's Gemini model.
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class RecipeRAGChatbot:
-    """Simple RAG chatbot for recipe dataset using Gemini Flash 2.5"""
+    """Simple RAG chatbot for recipe dataset using Gemini 2.0 Flash"""
 
     def __init__(self, api_key: str, recipes_df: pd.DataFrame):
         """
