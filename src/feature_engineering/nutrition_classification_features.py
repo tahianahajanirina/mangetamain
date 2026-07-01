@@ -17,8 +17,6 @@ import pandas as pd
 
 from src.utils.data_cache import DataCache
 
-# Configuration du logger
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -468,18 +466,18 @@ def main():
 
     df, stats = engineer.build_features(input_path, output_path)
 
-    print("\n" + "=" * 80)
-    print("STATISTIQUES FINALES")
-    print("=" * 80)
-    print(f"Recettes totales: {stats['n_recipes']:,}")
-    print(f"Features créées: {stats['n_features']}")
-    print(
-        f"\nHealth Score: {stats['health_score_stats']['mean']:.1f} ± {stats['health_score_stats']['std']:.1f}"
+    logger.info("=" * 80)
+    logger.info("STATISTIQUES FINALES")
+    logger.info("=" * 80)
+    logger.info(f"Recettes totales: {stats['n_recipes']:,}")
+    logger.info(f"Features créées: {stats['n_features']}")
+    logger.info(
+        f"Health Score: {stats['health_score_stats']['mean']:.1f} +/- {stats['health_score_stats']['std']:.1f}"
     )
-    print("\nCorrélations avec Health Score:")
-    print(f"  - Calories: {stats['feature_correlations']['health_score_calories']:.3f}")
-    print(f"  - Protéines: {stats['feature_correlations']['health_score_protein']:.3f}")
-    print(f"  - Sucre: {stats['feature_correlations']['health_score_sugar']:.3f}")
+    logger.info("Corrélations avec Health Score:")
+    logger.info(f"  - Calories: {stats['feature_correlations']['health_score_calories']:.3f}")
+    logger.info(f"  - Protéines: {stats['feature_correlations']['health_score_protein']:.3f}")
+    logger.info(f"  - Sucre: {stats['feature_correlations']['health_score_sugar']:.3f}")
 
 
 if __name__ == "__main__":

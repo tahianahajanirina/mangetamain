@@ -6,7 +6,7 @@ that can answer questions about recipes using Google's Gemini model.
 """
 
 import logging
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import google.generativeai as genai
 import numpy as np
@@ -142,7 +142,7 @@ Please provide a helpful, accurate, and concise answer based on the recipes prov
                 f"I apologize, but I encountered an error: {str(e)}. Please try again."
             )
 
-    def get_recipe_stats(self) -> Dict[str, any]:
+    def get_recipe_stats(self) -> Dict[str, Any]:
         """Get statistics about the recipe dataset"""
         stats = {
             "total_recipes": len(self.recipes_df),

@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <rect x="0" y="0" width="1200" height="700" rx="12" fill="#ffffff"/>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="5" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#1e1e1e"/>
+    </marker>
+    <marker id="arr-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="5" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#6366f1"/>
+    </marker>
+    <marker id="arr-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="5" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#f59e0b"/>
+    </marker>
+    <marker id="arr-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="5" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#FF4B4B"/>
+    </marker>
+  </defs>
+
+  <!-- ===== TITLE ===== -->
+  <text x="440" y="28" text-anchor="middle" font-size="22" font-weight="700" fill="#1e1e1e">MangetaMain — Architecture ML</text>
+  <text x="440" y="46" text-anchor="middle" font-size="12" fill="#6b7280">Plateforme de recommandation et analyse de recettes</text>
+
+  <!-- ===== DATA SOURCES ZONE ===== -->
+  <rect x="30" y="60" width="850" height="78" rx="10" fill="#fff7ed" fill-opacity="0.6" stroke="#f59e0b" stroke-width="1"/>
+  <text x="42" y="78" font-size="11" fill="#92400e" font-weight="700" letter-spacing="1">DATA SOURCES</text>
+
+  <rect x="120" y="86" width="320" height="38" rx="6" fill="#fed7aa" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="280" y="103" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">RAW_recipes.csv</text>
+  <text x="280" y="118" text-anchor="middle" font-size="10" fill="#92400e">230k+ recettes · ingrédients · nutrition · tags</text>
+
+  <rect x="480" y="86" width="340" height="38" rx="6" fill="#fed7aa" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="650" y="103" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">RAW_interactions.csv</text>
+  <text x="650" y="118" text-anchor="middle" font-size="10" fill="#92400e">1M+ avis utilisateurs · ratings · reviews</text>
+
+  <!-- Arrows: Data → ML Pipeline -->
+  <line x1="280" y1="138" x2="280" y2="165" stroke="#f59e0b" stroke-width="2" marker-end="url(#arr-orange)"/>
+  <line x1="650" y1="138" x2="650" y2="165" stroke="#f59e0b" stroke-width="2" marker-end="url(#arr-orange)"/>
+
+  <!-- ===== ML PIPELINE ZONE ===== -->
+  <rect x="30" y="170" width="850" height="300" rx="10" fill="#eef2ff" fill-opacity="0.45" stroke="#6366f1" stroke-width="1"/>
+  <text x="42" y="188" font-size="11" fill="#4338ca" font-weight="700" letter-spacing="1">ML PIPELINE — scikit-learn · PyTorch · HuggingFace</text>
+
+  <!-- Row 1: Supervised Models -->
+  <!-- Nutrition Tagger -->
+  <rect x="50" y="198" width="250" height="72" rx="6" fill="#c7d2fe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="175" y="216" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">Nutrition Tagger</text>
+  <text x="175" y="232" text-anchor="middle" font-size="10" fill="#4338ca">6 classifieurs binaires</text>
+  <text x="175" y="246" text-anchor="middle" font-size="9" fill="#6366f1">high_calorie · low_calorie · high_protein</text>
+  <text x="175" y="258" text-anchor="middle" font-size="9" fill="#6366f1">LogisticReg · RandomForest · GradientBoosting</text>
+
+  <!-- Nutrition Classifier -->
+  <rect x="320" y="198" width="250" height="72" rx="6" fill="#c7d2fe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="445" y="216" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">Nutrition Classifier</text>
+  <text x="445" y="232" text-anchor="middle" font-size="10" fill="#4338ca">4 catégories nutritionnelles</text>
+  <text x="445" y="246" text-anchor="middle" font-size="9" fill="#6366f1">Very Healthy → Healthy → Moderate → Indulgent</text>
+  <text x="445" y="258" text-anchor="middle" font-size="9" fill="#6366f1">RandomForest · 200 arbres</text>
+
+  <!-- Cooking Time Predictor -->
+  <rect x="590" y="198" width="270" height="72" rx="6" fill="#c7d2fe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="725" y="216" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">Cooking Time Predictor</text>
+  <text x="725" y="232" text-anchor="middle" font-size="10" fill="#4338ca">Régression temps de cuisson</text>
+  <text x="725" y="246" text-anchor="middle" font-size="9" fill="#6366f1">Ridge · RandomForest · GradientBoosting</text>
+  <text x="725" y="258" text-anchor="middle" font-size="9" fill="#6366f1">MAE ~5-8 min · R² ~0.80</text>
+
+  <!-- Row 2: Unsupervised + NLP + RecSys -->
+  <!-- Recipe Clustering -->
+  <rect x="50" y="286" width="250" height="72" rx="6" fill="#ddd6fe" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="175" y="304" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">Recipe Clustering</text>
+  <text x="175" y="320" text-anchor="middle" font-size="10" fill="#6d28d9">K-Means (k=3-10) + PCA</text>
+  <text x="175" y="334" text-anchor="middle" font-size="9" fill="#7c3aed">Silhouette optimization → 6-8 clusters</text>
+  <text x="175" y="346" text-anchor="middle" font-size="9" fill="#7c3aed">Quick &amp; Simple · Healthy · Elaborate…</text>
+
+  <!-- Sentiment Analysis -->
+  <rect x="320" y="286" width="250" height="72" rx="6" fill="#fef9c3" stroke="#eab308" stroke-width="1.5"/>
+  <text x="445" y="304" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">Sentiment Analysis</text>
+  <text x="445" y="320" text-anchor="middle" font-size="10" fill="#854d0e">NLP · HuggingFace Transformers</text>
+  <text x="445" y="334" text-anchor="middle" font-size="9" fill="#a16207">DistilBERT · RoBERTa</text>
+  <text x="445" y="346" text-anchor="middle" font-size="9" fill="#a16207">Fine-tuné sur avis culinaires</text>
+
+  <!-- Collaborative Filtering -->
+  <rect x="590" y="286" width="270" height="72" rx="6" fill="#ddd6fe" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="725" y="304" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">Collaborative Filtering</text>
+  <text x="725" y="320" text-anchor="middle" font-size="10" fill="#6d28d9">SVD Matrix Factorization</text>
+  <text x="725" y="334" text-anchor="middle" font-size="9" fill="#7c3aed">U·S·Vᵀ · k=50 facteurs latents</text>
+  <text x="725" y="346" text-anchor="middle" font-size="9" fill="#7c3aed">1M+ interactions → top-N recommandations</text>
+
+  <!-- HuggingFace badge on Sentiment -->
+  <text x="547" y="297" font-size="15" fill="#FFD21E">🤗</text>
+
+  <!-- Arrows: ML Pipeline → Chatbot & Streamlit -->
+  <line x1="280" y1="470" x2="280" y2="498" stroke="#6366f1" stroke-width="2" marker-end="url(#arr-blue)"/>
+  <line x1="650" y1="470" x2="650" y2="498" stroke="#6366f1" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+  <!-- ===== CHATBOT ZONE ===== -->
+  <rect x="30" y="485" width="400" height="75" rx="10" fill="#dbeafe" fill-opacity="0.4" stroke="#4285F4" stroke-width="1"/>
+  <text x="42" y="502" font-size="11" fill="#1d4ed8" font-weight="700" letter-spacing="1">CHATBOT RAG</text>
+
+  <rect x="50" y="510" width="360" height="36" rx="6" fill="#bfdbfe" stroke="#4285F4" stroke-width="1.5"/>
+  <text x="230" y="528" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">Gemini 2.0 Flash</text>
+  <text x="230" y="542" text-anchor="middle" font-size="10" fill="#1d4ed8">RAG chatbot · keyword-based retrieval</text>
+
+  <!-- Google "G" icon hint -->
+  <rect x="56" y="516" width="22" height="22" rx="4" fill="#4285F4"/>
+  <text x="67" y="533" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">G</text>
+
+  <!-- ===== STREAMLIT INTERFACE ZONE ===== -->
+  <rect x="30" y="580" width="850" height="105" rx="10" fill="#fee2e2" fill-opacity="0.35" stroke="#FF4B4B" stroke-width="1"/>
+  <text x="42" y="598" font-size="11" fill="#dc2626" font-weight="700" letter-spacing="1">INTERFACE — STREAMLIT</text>
+
+  <rect x="50" y="608" width="200" height="34" rx="6" fill="#fecaca" stroke="#FF4B4B" stroke-width="1.5"/>
+  <text x="150" y="630" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">Dashboard</text>
+
+  <rect x="268" y="608" width="200" height="34" rx="6" fill="#fecaca" stroke="#FF4B4B" stroke-width="1.5"/>
+  <text x="368" y="630" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">Recommandations</text>
+
+  <rect x="486" y="608" width="200" height="34" rx="6" fill="#fecaca" stroke="#FF4B4B" stroke-width="1.5"/>
+  <text x="586" y="630" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">Analyse Nutrition</text>
+
+  <rect x="140" y="650" width="190" height="28" rx="5" fill="#fecaca" stroke="#FF4B4B" stroke-width="1"/>
+  <text x="235" y="669" text-anchor="middle" font-size="12" fill="#1e1e1e">Sentiment Analysis</text>
+
+  <rect x="350" y="650" width="190" height="28" rx="5" fill="#fecaca" stroke="#FF4B4B" stroke-width="1"/>
+  <text x="445" y="669" text-anchor="middle" font-size="12" fill="#1e1e1e">Chatbot Culinaire</text>
+
+  <rect x="560" y="650" width="150" height="28" rx="5" fill="#fecaca" stroke="#FF4B4B" stroke-width="1"/>
+  <text x="635" y="669" text-anchor="middle" font-size="12" fill="#1e1e1e">Find Recipes</text>
+
+  <text x="755" y="669" font-size="10" fill="#dc2626">2700+ lignes · multi-pages</text>
+
+  <!-- Arrows: Chatbot → Streamlit -->
+  <line x1="230" y1="560" x2="230" y2="578" stroke="#FF4B4B" stroke-width="2" marker-end="url(#arr-red)"/>
+
+  <!-- Arrow: ML Pipeline center → Streamlit -->
+  <line x1="455" y1="470" x2="455" y2="578" stroke="#6366f1" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#arr-blue)"/>
+  <text x="465" y="540" font-size="10" fill="#6366f1">modèles &amp; résultats</text>
+
+  <!-- ===== TESTING & CI SIDEBAR ===== -->
+  <rect x="920" y="60" width="260" height="400" rx="10" fill="#dcfce7" fill-opacity="0.4" stroke="#22c55e" stroke-width="1"/>
+  <text x="932" y="78" font-size="11" fill="#15803d" font-weight="700" letter-spacing="1">TESTING &amp; CI/CD</text>
+
+  <!-- pytest -->
+  <rect x="940" y="92" width="220" height="40" rx="6" fill="#bbf7d0" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="1050" y="110" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">pytest</text>
+  <text x="1050" y="125" text-anchor="middle" font-size="10" fill="#15803d">124 tests · couverture complète</text>
+
+  <!-- GitHub Actions -->
+  <rect x="940" y="146" width="220" height="40" rx="6" fill="#bbf7d0" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="1050" y="164" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">GitHub Actions</text>
+  <text x="1050" y="179" text-anchor="middle" font-size="10" fill="#15803d">4 workflows CI</text>
+
+  <!-- Docker -->
+  <rect x="940" y="200" width="220" height="40" rx="6" fill="#bbf7d0" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="1050" y="218" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">Docker</text>
+  <text x="1050" y="233" text-anchor="middle" font-size="10" fill="#15803d">Containerisation CPU/GPU</text>
+
+  <!-- Tech stack summary -->
+  <text x="1050" y="270" text-anchor="middle" font-size="11" fill="#15803d" font-weight="600">Stack Technique</text>
+
+  <rect x="940" y="282" width="105" height="26" rx="5" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
+  <text x="992" y="300" text-anchor="middle" font-size="10" fill="#4338ca">scikit-learn</text>
+
+  <rect x="1055" y="282" width="105" height="26" rx="5" fill="#e0e7ff" stroke="#6366f1" stroke-width="1"/>
+  <text x="1107" y="300" text-anchor="middle" font-size="10" fill="#4338ca">PyTorch</text>
+
+  <rect x="940" y="316" width="105" height="26" rx="5" fill="#fef9c3" stroke="#eab308" stroke-width="1"/>
+  <text x="992" y="334" text-anchor="middle" font-size="10" fill="#854d0e">HuggingFace</text>
+
+  <rect x="1055" y="316" width="105" height="26" rx="5" fill="#dbeafe" stroke="#4285F4" stroke-width="1"/>
+  <text x="1107" y="334" text-anchor="middle" font-size="10" fill="#1d4ed8">Gemini API</text>
+
+  <rect x="940" y="350" width="105" height="26" rx="5" fill="#fee2e2" stroke="#FF4B4B" stroke-width="1"/>
+  <text x="992" y="368" text-anchor="middle" font-size="10" fill="#dc2626">Streamlit</text>
+
+  <rect x="1055" y="350" width="105" height="26" rx="5" fill="#f3f4f6" stroke="#6b7280" stroke-width="1"/>
+  <text x="1107" y="368" text-anchor="middle" font-size="10" fill="#374151">Pandas</text>
+
+  <rect x="940" y="384" width="220" height="26" rx="5" fill="#f3f4f6" stroke="#6b7280" stroke-width="1"/>
+  <text x="1050" y="402" text-anchor="middle" font-size="10" fill="#374151">Plotly · Matplotlib · Seaborn</text>
+
+  <rect x="940" y="418" width="220" height="26" rx="5" fill="#dcfce7" stroke="#22c55e" stroke-width="1"/>
+  <text x="1050" y="436" text-anchor="middle" font-size="10" fill="#15803d">DVC · Git · GitHub Actions</text>
+
+  <!-- Dashed arrow: main → testing sidebar -->
+  <line x1="880" y1="320" x2="920" y2="320" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+
+  <!-- ===== FLOW LABELS ===== -->
+  <text x="860" y="182" font-size="9" fill="#6b7280" transform="rotate(90, 860, 182)">données</text>
+  <text x="860" y="350" font-size="9" fill="#6b7280" transform="rotate(90, 860, 350)">prédictions</text>
+
+  <!-- Data flow arrows from data sources to specific models -->
+  <!-- recipes → Nutrition Tagger -->
+  <line x1="200" y1="138" x2="175" y2="196" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3 2" opacity="0.5"/>
+  <!-- recipes → Nutrition Classifier -->
+  <line x1="320" y1="138" x2="445" y2="196" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3 2" opacity="0.5"/>
+  <!-- recipes → Cooking Time -->
+  <line x1="380" y1="138" x2="725" y2="196" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3 2" opacity="0.5"/>
+  <!-- recipes → Clustering -->
+  <line x1="200" y1="138" x2="175" y2="284" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3 2" opacity="0.3"/>
+  <!-- interactions → Sentiment -->
+  <line x1="650" y1="138" x2="445" y2="284" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3 2" opacity="0.5"/>
+  <!-- interactions → Collaborative Filtering -->
+  <line x1="700" y1="138" x2="725" y2="284" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3 2" opacity="0.5"/>
+
+  <!-- ===== DECORATIVE CORNER ===== -->
+  <text x="1148" y="690" text-anchor="end" font-size="9" fill="#9ca3af">MangetaMain v1.0 · ML Recipe Platform</text>
+</svg>

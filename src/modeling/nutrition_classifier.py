@@ -33,8 +33,6 @@ from sklearn.preprocessing import StandardScaler
 
 from src.utils.data_cache import DataCache
 
-# Configuration du logger
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -278,7 +276,7 @@ class NutritionClassifier:
         report = classification_report(
             y_test, y_pred, target_names=self.class_names, zero_division=0
         )
-        print(report)
+        logger.info(f"\n{report}")
 
         # Matrice de confusion
         cm = confusion_matrix(y_test, y_pred)
@@ -493,7 +491,7 @@ def main():
     # Sauvegarder
     model_name = classifier.save_model("outputs/models")
 
-    print(f"\n✓ Modèle sauvegardé: {model_name}")
+    logger.info(f"Modèle sauvegardé: {model_name}")
 
 
 if __name__ == "__main__":

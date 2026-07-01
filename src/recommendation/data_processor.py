@@ -11,7 +11,7 @@ from scipy.sparse import csr_matrix
 
 from src.utils.data_cache import DataCache
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logger = logging.getLogger(__name__)
 
 
 class DataProcessor:
@@ -44,15 +44,15 @@ class DataProcessor:
         try:
             # Direct CSV read (not recommended, use DataCache instead)
             df = pd.read_csv(filepath)
-            logging.info(
+            logger.info(
                 f"{description} loaded successfully ({filepath}): {df.shape[0]} rows"
             )
             return df
         except FileNotFoundError:
-            logging.error(f"File {description} not found: {filepath}")
+            logger.error(f"File {description} not found: {filepath}")
             raise
         except Exception as e:
-            logging.error(f"Error loading {description} ({filepath}): {e}")
+            logger.error(f"Error loading {description} ({filepath}): {e}")
             raise
 
     def load_data(self, interactions_path, recipes_path):
@@ -62,7 +62,7 @@ class DataProcessor:
             interactions_path (str or Path): path to interactions file
             recipes_path (str or Path): path to recipes file
         """
-        logging.info("Loading data...")
+        logger.info("Loading data...")
         # Use global cache to avoid redundant loading
         self.df_interactions = DataCache.get_interactions(
             path=str(interactions_path), optimize_dtypes=True
@@ -72,10 +72,10 @@ class DataProcessor:
         )
 
         # Display basic information
-        logging.info(f"Unique interactions: {len(self.df_interactions)}")
-        logging.info(f"Unique users: {self.df_interactions['user_id'].nunique()}")
-        logging.info(f"Unique recipes: {self.df_interactions['recipe_id'].nunique()}")
-        logging.info(f"Total available recipes: {len(self.df_recipes)}")
+        logger.info(f"Unique interactions: {len(self.df_interactions)}")
+        logger.info(f"Unique users: {self.df_interactions['user_id'].nunique()}")
+        logger.info(f"Unique recipes: {self.df_interactions['recipe_id'].nunique()}")
+        logger.info(f"Total available recipes: {len(self.df_recipes)}")
 
     def create_sparse_matrix(
         self, user_col="user_id", recipe_col="recipe_id", rating_col="rating"
@@ -90,7 +90,7 @@ class DataProcessor:
         if self.df_interactions is None:
             raise ValueError("Interaction data must be loaded first")
 
-        logging.info("Creating sparse matrix...")
+        logger.info("Creating sparse matrix...")
 
         # Validate required columns exist
         required_cols = [user_col, recipe_col, rating_col]
@@ -114,7 +114,7 @@ class DataProcessor:
             (ratings, (user_codes, recipe_codes)), shape=(n_users, n_recipes)
         )
 
-        logging.info(
+        logger.info(
             f"Sparse matrix created: {n_users} users, {n_recipes} recipes, {self.sparse_matrix.nnz} ratings."
         )
 
@@ -140,7 +140,7 @@ class DataProcessor:
 
         try:
             user_idx = user_id_list.index(user_real_id)
-            logging.info(f"User found: ID {user_real_id}, index {user_idx}")
+            logger.info(f"User found: ID {user_real_id}, index {user_idx}")
             return user_idx, user_real_id
         except ValueError:
             raise ValueError(f"User {user_real_id} not found in data")
@@ -158,12 +158,12 @@ class DataProcessor:
 
         user_id_list = self.user_cat.cat.categories.tolist()
         if not (0 <= user_idx < len(user_id_list)):
-            logging.error(
+            logger.error(
                 f"User index {user_idx} out of bounds (0 to {len(user_id_list)-1})"
             )
             raise IndexError("User index out of bounds")
         selected_user_id = user_id_list[user_idx]
-        logging.info(f"User selected: idx {user_idx}, id {selected_user_id}")
+        logger.info(f"User selected: idx {user_idx}, id {selected_user_id}")
         return selected_user_id
 
     def get_user_historical_recipes(self, user_id, top_n=10):
@@ -177,7 +177,7 @@ class DataProcessor:
         """
         user_ratings = self.df_interactions[self.df_interactions["user_id"] == user_id]
         if user_ratings.empty:
-            logging.warning(f"No historical data found for user {user_id}")
+            logger.warning(f"No historical data found for user {user_id}")
             return pd.DataFrame(columns=["id", "name", "rating"])
 
         # Sort by rating descending and get top N

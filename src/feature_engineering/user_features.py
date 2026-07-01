@@ -13,7 +13,6 @@ import pandas as pd
 
 from src.utils.data_cache import DataCache
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -273,10 +272,10 @@ def main():
 
     # Afficher les stats
     stats = builder.get_feature_stats()
-    print("\nSTATISTIQUES:")
+    logger.info("STATISTIQUES:")
     for key, value in stats.items():
         if key != "columns":
-            print(f"  {key}: {value}")
+            logger.info(f"  {key}: {value}")
 
 
 if __name__ == "__main__":
